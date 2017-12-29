@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Carcassonne</title>
+    <script src="/assets/js/lodash.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="/assets/css/index.css">
+  </head>
+
+  <body>
+    <div id="app">
+      <div v-if="state === 'draw'">
+        <button class="draw-button" @click="draw" >
+          DRAW
+        </button>
+      </div>
+      <div v-else-if="state === 'action'">
+        <current-tile
+          v-bind:current-tile="currentTile"
+          v-bind:rotate-tile="rotateTile">
+        </current-tile>
+      </div>
+      <div class='game'>
+        <tile-row
+          v-for="(row, index) in grid"
+          v-bind:row="row"
+          v-bind:row-index="index"
+          v-bind:current-tile="currentTile"
+          v-bind:get-tile="getTile"
+          v-bind:play-tile="playTile"
+          v-bind:key="index">
+        </tile-row>
+      </div>
+    </div>
+
+    <script src="/assets/js/index.js"></script>
+  </body>
+</html>
