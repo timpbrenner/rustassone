@@ -1,7 +1,7 @@
 table! {
     tile_cities (id) {
         id -> Int4,
-        tile_id -> Nullable<Int4>,
+        tile_id -> Int4,
         city_side -> Int4,
         tile_group -> Int4,
     }
@@ -10,7 +10,7 @@ table! {
 table! {
     tile_roads (id) {
         id -> Int4,
-        tile_id -> Nullable<Int4>,
+        tile_id -> Int4,
         road_side -> Int4,
         tile_group -> Int4,
     }
@@ -19,7 +19,6 @@ table! {
 table! {
     tiles (id) {
         id -> Int4,
-        status -> Nullable<Varchar>,
     }
 }
 
