@@ -30,9 +30,9 @@ const TileHelper = {
   },
 
   matchesSurrounding(tile, getTile, row, column) {
-    const above = getTile(row + 1, column);
+    const above = getTile(row - 1, column);
     const right = getTile(row, column + 1);
-    const below = getTile(row - 1, column);
+    const below = getTile(row + 1, column);
     const left = getTile(row, column - 1);
 
     return (!above.playerId || TileHelper.sideType(tile, 0) === TileHelper.sideType(above, 2)) &&
