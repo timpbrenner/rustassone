@@ -105,7 +105,7 @@ Vue.component('tile', {
         return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
       }
 
-      const matches = !this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
+      const matches = this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
       const surround = this.anySurround();
 
       if (matches && surround && this.hover) {
@@ -155,7 +155,7 @@ var app = new Vue({
       });
     },
     drawTile: function(tile) {
-      this.currentTile = Object.assign({}, tile, { playerId: -1 });
+      this.currentTile = Object.assign({}, tile, { playerId: this.playerId });
       this.state = 'action';
     },
     getTile: function(row, column) {
@@ -193,7 +193,7 @@ var app = new Vue({
       const newGrid = _.cloneDeep(this.grid);
       const rowLength = newGrid[0].length;
       const columnLength = newGrid[0].length;
-      newGrid[row][column] = this.currentTile;
+      newGrid[row][column] = Object.assign(this.grid[row][column], this.currentTile);
 
       if (row === 0) {
         // add row in the beginning
@@ -207,7 +207,7 @@ var app = new Vue({
       } else if (row === this.grid.length - 1) {
         // add row at end
         const newRow = [];
-        rowOffset = this.grid[rowLength][0].rowOffset + 1;
+        rowOffset = this.grid[rowLength - 1][0].rowOffset + 1;
         columnOffset = this.grid[0][0].columnOffset;
         for (i = 0; i < rowLength; i++) {
           newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
@@ -223,10 +223,10 @@ var app = new Vue({
         newGrid.forEach(function(row, i) {
           row.unshift({ columnOffset: columnOffset, rowOffset: rowOffset + i});
         })
-      } else if (column === columnaLength - 1) {
+      } else if (column === columnLength - 1) {
         // add column at end of each row
         rowOffset = this.grid[0][0].rowOffset;
-        columnOffset = this.grid[0][columnLength].columnOffset + 1;
+        columnOffset = this.grid[0][columnLength - 1].columnOffset + 1;
         newGrid.forEach(function(row, i) {
           row.push({ columnOffset: columnOffset, rowOffset: rowOffset + i});
         })
