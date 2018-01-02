@@ -2,7 +2,15 @@ const defaultTile = {
   playerId: -1,
   cities: [0],
   roads: [1,3],
+  rowOffset: 0,
+  columnOffset: 0,
 };
+
+const defaultGrid = [
+  [{ rowOffset: -1, columnOffset: -1 }, { rowOffset: -1, columnOffset: 0 }, { rowOffset: -1, columnOffset: 1 }],
+  [{ rowOffset: 0, columnOffset: -1 }, defaultTile, { rowOffset: 0, columnOffset: 1 }],
+  [{ rowOffset: 1, columnOffset: -1 }, { rowOffset: 1, columnOffset: 0 }, { rowOffset: 1, columnOffset: 1 }],
+];
 
 const TileHelper = {
   sideType(tile, side) {
@@ -42,10 +50,6 @@ const TileHelper = {
   }
 };
 
-const isEmpty = function(obj) {
-  return Object.keys(obj).length == 0;
-}
-
 Vue.component('current-tile', {
   props: ['currentTile', 'rotateTile'],
   template: '<div v-bind:class="classes"\
@@ -77,16 +81,16 @@ Vue.component('tile', {
       this.hover = true;
     },
     anySurround() {
-      return !isEmpty(this.getTile(this.row - 1, this.column)) ||
-        !isEmpty(this.getTile(this.row, this.column - 1)) ||
-        !isEmpty(this.getTile(this.row + 1, this.column)) ||
-        !isEmpty(this.getTile(this.row, this.column + 1));
+      return this.getTile(this.row - 1, this.column).playerId ||
+        this.getTile(this.row, this.column - 1).playerId ||
+        this.getTile(this.row + 1, this.column).playerId ||
+        this.getTile(this.row, this.column + 1).playerId;
     },
     play() {
       if (!this.anySurround()) { return; }
       if (!TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column)) { return; }
 
-      this.playTile(this.row, this.column)
+      this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset)
     }
   },
   data: function() {
@@ -101,7 +105,7 @@ Vue.component('tile', {
         return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
       }
 
-      const matches = !_.isEmpty(this.currentTile) && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
+      const matches = !this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
       const surround = this.anySurround();
 
       if (matches && surround && this.hover) {
@@ -140,11 +144,8 @@ var app = new Vue({
   data: {
     state: 'draw',
     currentTile: defaultTile,
-    grid: [
-    [{}, {}, {}],
-    [{}, defaultTile, {}],
-    [{}, {}, {}],
-    ]
+    playerId: 1,
+    grid: defaultGrid,
   },
   methods: {
     draw: function() {
@@ -154,7 +155,7 @@ var app = new Vue({
       });
     },
     drawTile: function(tile) {
-      this.currentTile = Object.assign({}, tile, { playerId: -1});
+      this.currentTile = Object.assign({}, tile, { playerId: -1 });
       this.state = 'action';
     },
     getTile: function(row, column) {
@@ -172,35 +173,62 @@ var app = new Vue({
         roads: _.flatMap(this.currentTile.roads, function(side) { return (side + 1) % 4; }),
       })
     },
-    playTile: function(row, column) {
+    playTile: function(row, column, rowOffset, columnOffset) {
+      $.ajax({
+        url: 'http://localhost:8000/game/1/play',
+        data: {
+          tile_id: this.currentTile.id,
+          player_id: this.playerId,
+          row_offset: rowOffset,
+          column_offset: columnOffset,
+        },
+        success: function(d) { console.log(d) }
+      });
+
+      this.placeTile(row, column);
+    },
+    placeTile: function(row, column) {
+      let rowOffset = 0;
+      let columnOffset = 0;
       const newGrid = _.cloneDeep(this.grid);
+      const rowLength = newGrid[0].length;
+      const columnLength = newGrid[0].length;
       newGrid[row][column] = this.currentTile;
 
       if (row === 0) {
-        // add row in the begining
+        // add row in the beginning
         const newRow = [];
-        for (i = 0; i < newGrid[0].length; i++) {
-          newRow.push({});
+        rowOffset = this.grid[0][0].rowOffset - 1;
+        columnOffset = this.grid[0][0].columnOffset;
+        for (i = 0; i < rowLength; i++) {
+          newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
         }
         newGrid.unshift(newRow);
       } else if (row === this.grid.length - 1) {
         // add row at end
         const newRow = [];
-        for (i = 0; i < newGrid[0].length; i++) {
-          newRow.push({});
+        rowOffset = this.grid[rowLength][0].rowOffset + 1;
+        columnOffset = this.grid[0][0].columnOffset;
+        for (i = 0; i < rowLength; i++) {
+          newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
         }
+
         newGrid.push(newRow);
       }
 
       if (column === 0) {
         // add column at beginning of each row
-        newGrid.forEach(function(row) {
-          row.unshift({});
+        rowOffset = this.grid[0][0].rowOffset;
+        columnOffset = this.grid[0][0].columnOffset - 1;
+        newGrid.forEach(function(row, i) {
+          row.unshift({ columnOffset: columnOffset, rowOffset: rowOffset + i});
         })
-      } else if (column === this.grid[0].length - 1) {
+      } else if (column === columnaLength - 1) {
         // add column at end of each row
-        newGrid.forEach(function(row) {
-          row.push({});
+        rowOffset = this.grid[0][0].rowOffset;
+        columnOffset = this.grid[0][columnLength].columnOffset + 1;
+        newGrid.forEach(function(row, i) {
+          row.push({ columnOffset: columnOffset, rowOffset: rowOffset + i});
         })
       }
 
