@@ -35,19 +35,21 @@ fn game(current_game_id: String) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join("index.html")).ok()
 }
 
-#[get("/<current_game_id>/current")]
-fn current(current_game_id: String) -> Json<BlahGame> {
-    get_game(current_game_id)
+#[get("/<id>/current")]
+fn current(id: String) -> Json<JsGame> {
+    let game_id = id.parse().unwrap();
+
+   Json(get_game(game_id))
 }
 
 #[get("/<current_game_id>/draw")]
-fn draw(current_game_id: String) -> Json<BlahTile> {
-    draw_tile(current_game_id)
+fn draw(current_game_id: String) -> Json<JsTile> {
+    Json(draw_tile(current_game_id))
 }
 
 #[get("/<current_game_id>/play?<play>")]
-fn play(current_game_id: String, play: TilePlay) -> Json<BlahTile> {
-    play_tile(current_game_id, play)
+fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
+    Json(play_tile(current_game_id, play))
 }
 
 #[get("/<file..>")]

@@ -20,7 +20,7 @@
           v-bind:rotate-tile="rotateTile">
         </current-tile>
       </div>
-      <div class='game'>
+      <div class='game' v-if="grid">
         <tile-row
           v-for="(row, index) in grid"
           v-bind:row="row"
@@ -30,6 +30,9 @@
           v-bind:play-tile="playTile"
           v-bind:key="index">
         </tile-row>
+      </div>
+      <div v-else>
+        LOADING
       </div>
     </div>
 

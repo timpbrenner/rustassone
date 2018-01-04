@@ -11,7 +11,7 @@ table! {
         id -> Int4,
         game_id -> Int4,
         tile_id -> Int4,
-        player_id -> Int4,
+        player_id -> Nullable<Int4>,
         row_offset -> Int4,
         column_offset -> Int4,
     }

@@ -145,9 +145,20 @@ var app = new Vue({
     state: 'draw',
     currentTile: defaultTile,
     playerId: 1,
-    grid: defaultGrid,
+    grid: null,
+  },
+  created: function () {
+    $.ajax({
+      url: 'http://localhost:8000/game/1/current',
+      success: this.updateGrid,
+    });
   },
   methods: {
+    updateGrid: function(data) {
+      this.grid = data.grid;
+      this.state = data.currentState;
+      this.currentTurn = data.currentPlayerId;
+    },
     draw: function() {
       $.ajax({
         url: 'http://localhost:8000/game/1/draw',
@@ -191,7 +202,7 @@ var app = new Vue({
       let rowOffset = 0;
       let columnOffset = 0;
       const newGrid = _.cloneDeep(this.grid);
-      const rowLength = newGrid[0].length;
+      const rowLength = newGrid.length;
       const columnLength = newGrid[0].length;
       newGrid[row][column] = Object.assign(this.grid[row][column], this.currentTile);
 
