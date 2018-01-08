@@ -31,6 +31,7 @@ pub struct Game {
 #[derive(Queryable)]
 pub struct Player {
   pub id: i32,
+  pub username: Option<String>,
 }
 
 #[derive(Queryable)]

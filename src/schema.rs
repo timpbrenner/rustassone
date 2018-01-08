@@ -28,6 +28,7 @@ table! {
 table! {
     players (id) {
         id -> Int4,
+        username -> Nullable<Text>,
     }
 }
 

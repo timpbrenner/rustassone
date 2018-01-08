@@ -1,17 +1,3 @@
-const defaultTile = {
-  playerId: -1,
-  cities: [0],
-  roads: [1,3],
-  rowOffset: 0,
-  columnOffset: 0,
-};
-
-const defaultGrid = [
-  [{ rowOffset: -1, columnOffset: -1 }, { rowOffset: -1, columnOffset: 0 }, { rowOffset: -1, columnOffset: 1 }],
-  [{ rowOffset: 0, columnOffset: -1 }, defaultTile, { rowOffset: 0, columnOffset: 1 }],
-  [{ rowOffset: 1, columnOffset: -1 }, { rowOffset: 1, columnOffset: 0 }, { rowOffset: 1, columnOffset: 1 }],
-];
-
 const TileHelper = {
   sideType(tile, side) {
     if (tile.cities.indexOf(side) >= 0) {
@@ -105,7 +91,7 @@ Vue.component('tile', {
         return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
       }
 
-      const matches = this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
+      const matches = this.currentTile && this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
       const surround = this.anySurround();
 
       if (matches && surround && this.hover) {
@@ -143,8 +129,8 @@ var app = new Vue({
   el: '#app',
   data: {
     state: 'draw',
-    currentTile: defaultTile,
-    playerId: 1,
+    currentTile: null,
+    playerId: null,
     grid: null,
   },
   created: function () {
@@ -154,6 +140,12 @@ var app = new Vue({
     });
   },
   methods: {
+    join: function() {
+      $.ajax({
+        url: 'http://localhost:8000/game/1/draw',
+        success: this.drawTile,
+      });
+    },
     updateGrid: function(data) {
       this.grid = data.grid;
       this.state = data.currentState;

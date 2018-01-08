@@ -9,7 +9,14 @@
 
   <body>
     <div id="app">
-      <div v-if="state === 'draw'">
+      <div v-if="playerId === null">
+        <div class="join">
+          <div>JOIN MATCH</div><br />
+          <input id="username" type="text"><br />
+          <button id="join" @click="join">Submit</button>
+        </div>
+      </div>
+      <div v-else-if="state === 'draw'">
         <button class="draw-button" @click="draw" >
           DRAW
         </button>

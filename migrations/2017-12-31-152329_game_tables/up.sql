@@ -5,7 +5,8 @@ CREATE TABLE games (
 );
 
 CREATE TABLE players (
-  id SERIAL PRIMARY KEY
+  id SERIAL PRIMARY KEY,
+  username TEXT
 );
 
 CREATE TABLE game_players (
