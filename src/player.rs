@@ -1,10 +1,8 @@
 use diesel::prelude::*;
-use diesel::sql_query;
 use diesel::insert_into;
 
 use models::*;
 use lib::*;
-use std;
 
 pub fn join_game(current_game_id: i32, sign_in_name: String) -> Player {
     use schema::players::dsl::*;
@@ -12,7 +10,7 @@ pub fn join_game(current_game_id: i32, sign_in_name: String) -> Player {
 
     let connection = establish_connection();
     let mut player_result = players.filter(username.eq(&sign_in_name)).get_result::<Player>(&connection).ok();
-    let mut player: Player;
+    let player: Player;
 
     if player_result.is_none() {
         insert_into(players).values((username.eq(&sign_in_name))).execute(&connection);

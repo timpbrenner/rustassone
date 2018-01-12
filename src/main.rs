@@ -29,7 +29,12 @@ pub use player::*;
 
 #[get("/")]
 fn index() -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join("login.html")).ok()
+    NamedFile::open(Path::new("static/").join("games.html")).ok()
+}
+
+#[get("/")]
+fn create() -> Json<JsGame> {
+    Json(create_game())
 }
 
 #[get("/<current_game_id>")]
@@ -64,7 +69,9 @@ fn draw(current_game_id: String) -> Json<JsTile> {
 
 #[get("/<current_game_id>/play?<play>")]
 fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
-    Json(play_tile(current_game_id, play))
+    let int_game_id:i32 = current_game_id.parse().unwrap();
+
+    Json(play_tile(int_game_id, play))
 }
 
 #[get("/<file..>")]
@@ -75,7 +82,7 @@ fn files(file: PathBuf) -> Option<NamedFile> {
 fn main() {
     rocket::ignite()
         .mount("/", routes![index])
-        .mount("/game", routes![game, current, join, draw, play])
+        .mount("/game", routes![create, game, current, join, draw, play])
         .mount("assets/", routes![files])
         .launch();
 }
