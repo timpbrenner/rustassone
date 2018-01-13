@@ -27,6 +27,11 @@
           v-bind:rotate-tile="rotateTile">
         </current-tile>
       </div>
+      <div v-else-if="state === 'not_started'">
+        <button class="start-button" @click="start" >
+          START
+        </button>
+      </div>
       <div class='game' v-if="grid">
         <tile-row
           v-for="(row, index) in grid"

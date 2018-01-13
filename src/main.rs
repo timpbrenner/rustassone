@@ -27,11 +27,19 @@ pub use lib::*;
 pub use game::*;
 pub use player::*;
 
+// ROOT
 #[get("/")]
 fn index() -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join("games.html")).ok()
 }
 
+// ASSETS
+#[get("/<file..>")]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
+}
+
+// GAME
 #[get("/")]
 fn create() -> Json<JsGame> {
     Json(create_game())
@@ -48,11 +56,12 @@ pub struct UserData {
 }
 
 #[get("/<id>/join?<user>")]
-fn join(id: String, user: UserData) -> Json<JsGame> {
+fn join(id: String, user: UserData) -> Json<JsPlayer> {
     let game_id = id.parse().unwrap();
 
-    join_game(game_id, user.username);
-    Json(get_game(game_id))
+    println!("USERNAME: {}", user.username);
+
+    Json(join_game(game_id, user.username))
 }
 
 #[get("/<id>/current")]
@@ -74,15 +83,17 @@ fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
     Json(play_tile(int_game_id, play))
 }
 
-#[get("/<file..>")]
-fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+#[get("/<id>/start")]
+fn start(id: String) -> Json<JsGame> {
+    let int_game_id:i32 = id.parse().unwrap();
+
+    Json(start_game(int_game_id))
 }
 
 fn main() {
     rocket::ignite()
         .mount("/", routes![index])
-        .mount("/game", routes![create, game, current, join, draw, play])
+        .mount("/game", routes![create, game, current, start, join, draw, play])
         .mount("assets/", routes![files])
         .launch();
 }

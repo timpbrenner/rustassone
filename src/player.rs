@@ -4,7 +4,12 @@ use diesel::insert_into;
 use models::*;
 use lib::*;
 
-pub fn join_game(current_game_id: i32, sign_in_name: String) -> Player {
+#[derive(Serialize)]
+pub struct JsPlayer {
+    pub id: i32,
+}
+
+pub fn join_game(current_game_id: i32, sign_in_name: String) -> JsPlayer {
     use schema::players::dsl::*;
     use schema::game_players::dsl::*;
 
@@ -26,5 +31,5 @@ pub fn join_game(current_game_id: i32, sign_in_name: String) -> Player {
             )
         ).execute(&connection);
 
-    player
+    JsPlayer { id: player.id }
 }
