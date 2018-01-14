@@ -47,6 +47,7 @@ pub struct GameTile {
   pub game_id: i32,
   pub tile_id: i32,
   pub player_id: Option<i32>,
+  pub meeple_location: Option<i32>,
   pub row_offset: i32,
   pub column_offset: i32,
 }

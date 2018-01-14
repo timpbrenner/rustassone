@@ -54,10 +54,6 @@ pub fn start_game(game_id: i32) -> JsGame {
     let target = games.filter(::schema::games::dsl::id.eq(game_id));
     update(target).set(current_state.eq("draw")).execute(&connection);
 
-    // let game = games.filter().get_result::<Game>(&connection).expect("Error loading games");
-    // game.current_state = "draw";
-    // game.save_changes(&connection);
-
     get_game(game_id)
 }
 

@@ -28,26 +28,30 @@ pub use game::*;
 pub use player::*;
 
 // ROOT
+// Path for game lobbies
 #[get("/")]
 fn index() -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join("games.html")).ok()
 }
 
 // ASSETS
+// Serves js and css assets
 #[get("/<file..>")]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join(file)).ok()
 }
 
 // GAME
-#[get("/")]
-fn create() -> Json<JsGame> {
-    Json(create_game())
-}
-
+// Page URL: specific game
 #[get("/<current_game_id>")]
 fn game(current_game_id: String) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join("index.html")).ok()
+}
+
+// API CALL: Creates a game and return JSON of new game
+#[get("/")]
+fn create() -> Json<JsGame> {
+    Json(create_game())
 }
 
 #[derive(FromForm)]
@@ -55,6 +59,7 @@ pub struct UserData {
     pub username: String
 }
 
+// API CALL: Player joining the game
 #[get("/<id>/join?<user>")]
 fn join(id: String, user: UserData) -> Json<JsPlayer> {
     let game_id = id.parse().unwrap();
@@ -64,6 +69,7 @@ fn join(id: String, user: UserData) -> Json<JsPlayer> {
     Json(join_game(game_id, user.username))
 }
 
+// API CALL: Current state of a specific game
 #[get("/<id>/current")]
 fn current(id: String) -> Json<JsGame> {
     let game_id = id.parse().unwrap();
@@ -71,23 +77,26 @@ fn current(id: String) -> Json<JsGame> {
     Json(get_game(game_id))
 }
 
-#[get("/<current_game_id>/draw")]
-fn draw(current_game_id: String) -> Json<JsTile> {
-    Json(draw_tile(current_game_id))
-}
-
-#[get("/<current_game_id>/play?<play>")]
-fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
-    let int_game_id:i32 = current_game_id.parse().unwrap();
-
-    Json(play_tile(int_game_id, play))
-}
-
+// API CALL: Start Game
 #[get("/<id>/start")]
 fn start(id: String) -> Json<JsGame> {
     let int_game_id:i32 = id.parse().unwrap();
 
     Json(start_game(int_game_id))
+}
+
+// API CALL: Draw a tile
+#[get("/<current_game_id>/draw")]
+fn draw(current_game_id: String) -> Json<JsTile> {
+    Json(draw_tile(current_game_id))
+}
+
+// API CALL: Play a tile
+#[get("/<current_game_id>/play?<play>")]
+fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
+    let int_game_id:i32 = current_game_id.parse().unwrap();
+
+    Json(play_tile(int_game_id, play))
 }
 
 fn main() {

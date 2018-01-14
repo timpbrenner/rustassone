@@ -214,7 +214,7 @@ var app = new Vue({
         const newRow = [];
         rowOffset = this.grid[0][0].rowOffset - 1;
         columnOffset = this.grid[0][0].columnOffset;
-        for (i = 0; i < rowLength; i++) {
+        for (i = 0; i < columnLength; i++) {
           newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
         }
         newGrid.unshift(newRow);
@@ -223,7 +223,7 @@ var app = new Vue({
         const newRow = [];
         rowOffset = this.grid[rowLength - 1][0].rowOffset + 1;
         columnOffset = this.grid[0][0].columnOffset;
-        for (i = 0; i < rowLength; i++) {
+        for (i = 0; i < columnLength; i++) {
           newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
         }
 
