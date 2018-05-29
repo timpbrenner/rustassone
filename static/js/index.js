@@ -136,14 +136,15 @@ var app = new Vue({
   },
   created: function () {
     $.ajax({
-      url: 'http://localhost:8000/game/' + this.gameId + '/current',
+      url: 'http://localhost:8088/game/' + this.gameId,
       success: this.updateGrid,
+      error: function() {console.log('CREATED GAME ERROR')},
     });
   },
   methods: {
     join: function() {
       $.ajax({
-        url: 'http://localhost:8000/game/' + this.gameId + '/join',
+        url: 'http://localhost:8088/game/' + this.gameId + '/join',
         data: { username: $('#username').val() },
         success: this.joinPlayer,
       });
@@ -158,13 +159,13 @@ var app = new Vue({
     },
     start: function() {
       $.ajax({
-        url: 'http://localhost:8000/game/' + this.gameId + '/start',
+        url: 'http://localhost:8088/game/' + this.gameId + '/start',
         success: this.updateGrid,
       });
     },
     draw: function() {
       $.ajax({
-        url: 'http://localhost:8000/game/' + this.gameId + '/draw',
+        url: 'http://localhost:8088/game/' + this.gameId + '/draw',
         success: this.drawTile,
       });
     },
@@ -189,7 +190,7 @@ var app = new Vue({
     },
     playTile: function(row, column, rowOffset, columnOffset) {
       $.ajax({
-        url: 'http://localhost:8000/game/' + this.gameId + '/play',
+        url: 'http://localhost:8088/game/' + this.gameId + '/play',
         data: {
           tile_id: this.currentTile.id,
           player_id: this.playerId,

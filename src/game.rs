@@ -6,6 +6,8 @@ use diesel::update;
 use models::*;
 use lib::*;
 use std;
+use actix_web::{Responder, HttpRequest, HttpResponse, Error};
+use serde_json;
 
 #[derive(Serialize)]
 pub struct JsTile {
@@ -25,7 +27,21 @@ pub struct JsGame {
     pub currentState: String,
 }
 
-#[derive(FromForm)]
+/// Responder
+impl Responder for JsGame {
+    type Item = HttpResponse;
+    type Error = Error;
+
+    fn respond_to<S>(self, req: &HttpRequest<S>) -> Result<HttpResponse, Error> {
+        let body = serde_json::to_string(&self)?;
+
+        // Create response and set content type
+        Ok(HttpResponse::Ok()
+            .content_type("application/json")
+            .body(body))
+    }
+}
+
 pub struct TilePlay {
     pub tile_id: Option<i32>,
     pub player_id: Option<i32>,
@@ -38,7 +54,7 @@ pub fn create_game() -> JsGame {
 
     let conn = establish_connection();
     let game_result = insert_into(games)
-                .values((current_state.eq("not_started")))
+                .values(current_state.eq("not_started"))
                 .get_result::<Game>(&conn);
 
     let game = game_result.ok().unwrap();

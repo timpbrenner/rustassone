@@ -18,7 +18,7 @@ pub fn join_game(current_game_id: i32, sign_in_name: String) -> JsPlayer {
     let player: Player;
 
     if player_result.is_none() {
-        insert_into(players).values((username.eq(&sign_in_name))).execute(&connection);
+        insert_into(players).values(username.eq(&sign_in_name)).execute(&connection);
         player_result = players.filter(username.eq(&sign_in_name)).get_result::<Player>(&connection).ok();
     }
     player = player_result.unwrap();

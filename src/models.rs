@@ -1,6 +1,7 @@
 use schema::tiles;
 
 #[derive(Queryable, QueryableByName)]
+#[table_name = "tiles"]
 pub struct Tile {
     pub id: i32,
 }
