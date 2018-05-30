@@ -4,6 +4,7 @@
 extern crate serde_json;
 extern crate dotenv;
 extern crate actix_web;
+extern crate env_logger;
 
 mod schema;
 mod models;
@@ -14,6 +15,7 @@ mod player;
 use std::path::{Path, PathBuf};
 use actix_web::{
     middleware::cors::Cors,
+    middleware::Logger,
     server,
     App,
     HttpRequest,
@@ -21,6 +23,7 @@ use actix_web::{
     Result,
     http::Method,
     fs::NamedFile,
+    Query,
     Json
 };
 
@@ -92,21 +95,31 @@ fn show(req: HttpRequest) -> impl Responder {
 
 #[derive(Deserialize)]
 struct Info {
-    username: String
+    username: String,
+}
+
+#[derive(Deserialize)]
+struct GamePath {
+    game_id: u32,
 }
 
 // API CALL: Player joining the game
-fn create_player(data: (actix_web::Path<i32>, Json<Info>)) -> impl Responder {
-    let (params, info) = data;
-    // println!("CREATE PLAYER: {}", params.0);
-    println!("USERNAME: {}", info.username);
+fn create_player(data: (actix_web::Path<GamePath>, Json<Info>)) -> Result<String> {
+    println!("CREATE PLAYER");
+    let (path, d) = data;
 
-    "SOMETHING"
-    // join_game(game_id, user.username)
+    println!("SHOW GAME: {}, {}", path.game_id, d.username);
+
+    // join_game(game_id, info.username)
+    Ok("Welcome!".to_string())
 }
 
 fn main() {
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
+
     server::new(|| App::new()
+        .middleware(Logger::default())
         .configure(|app| {
             Cors::for_app(app)
                 .send_wildcard()

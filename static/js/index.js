@@ -1,7 +1,6 @@
 const TileHelper = {
   sideType(tile, side) {
-    if (tile.cities.indexOf(side) >= 0) {
-      return 1;
+    if (tile.cities.indexOf(side) >= 0) { return 1;
     } else if (tile.roads.indexOf(side) >= 0) {
       return 2;
     }
@@ -143,10 +142,19 @@ var app = new Vue({
   },
   methods: {
     join: function() {
+      console.log($('#username').val());
       $.ajax({
-        url: 'http://localhost:8088/game/' + this.gameId + '/join',
-        data: { username: $('#username').val() },
+        method: 'POST',
+        url: 'http://localhost:8088/game/' + this.gameId + '/players',
+        contentType: 'application/json',
+        data: JSON.stringify({ username: $('#username').val() }),
         success: this.joinPlayer,
+        error: function(e, status, message) {
+          console.log('Player Join Fail');
+          console.log(e);
+          console.log(status);
+          console.log(message);
+        },
       });
     },
     joinPlayer: function(data) {
