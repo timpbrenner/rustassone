@@ -23,7 +23,6 @@ use actix_web::{
     Result,
     http::Method,
     fs::NamedFile,
-    Query,
     Json
 };
 
@@ -32,27 +31,15 @@ pub use lib::*;
 pub use game::*;
 pub use player::*;
 
-// // API CALL: Start Game
-// #[get("/<id>/start")]
-// fn start(id: String) -> Json<JsGame> {
-//     let int_game_id:i32 = id.parse().unwrap();
-//
-//     Json(start_game(int_game_id))
-// }
-//
-// // API CALL: Draw a tile
-// #[get("/<current_game_id>/draw")]
-// fn draw(current_game_id: String) -> Json<JsTile> {
-//     Json(draw_tile(current_game_id))
-// }
-//
-// // API CALL: Play a tile
-// #[get("/<current_game_id>/play?<play>")]
-// fn play(current_game_id: String, play: TilePlay) -> Json<JsTile> {
-//     let int_game_id:i32 = current_game_id.parse().unwrap();
-//
-//     Json(play_tile(int_game_id, play))
-// }
+#[derive(Deserialize)]
+struct Info {
+    username: String,
+}
+
+#[derive(Deserialize)]
+struct GamePath {
+    game_id: i32,
+}
 
 // ROOT
 // Path for game lobbies
@@ -93,25 +80,33 @@ fn show(req: HttpRequest) -> impl Responder {
     get_game(int_game_id)
 }
 
-#[derive(Deserialize)]
-struct Info {
-    username: String,
-}
-
-#[derive(Deserialize)]
-struct GamePath {
-    game_id: u32,
+// API CALL: Update Game(All it updates is game to start)
+fn update(path: actix_web::Path<GamePath>) -> impl Responder {
+    println!("UPDATE GAME: {}", path.game_id);
+    start_game(path.game_id)
 }
 
 // API CALL: Player joining the game
-fn create_player(data: (actix_web::Path<GamePath>, Json<Info>)) -> Result<String> {
-    println!("CREATE PLAYER");
-    let (path, d) = data;
+fn create_player(data: (actix_web::Path<GamePath>, Json<Info>)) -> impl Responder {
+    let (path, info) = data;
+    println!("CREATE PLAYER: {}, {}", path.game_id, info.username);
 
-    println!("SHOW GAME: {}, {}", path.game_id, d.username);
+    join_game(path.game_id, info.username.to_string())
+}
 
-    // join_game(game_id, info.username)
-    Ok("Welcome!".to_string())
+ // API CALL: Draw a tile
+fn draw(path: actix_web::Path<GamePath>) -> impl Responder {
+     draw_tile(path.game_id)
+ }
+
+// API CALL: Play a tile
+fn play(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
+    println!("PLAY TILE");
+
+    let (path, play) = data;
+    println!("PLAY TILE: {}, {}", path.game_id, play.tile_id.unwrap());
+
+    play_tile(path.game_id, play.into_inner())
 }
 
 fn main() {
@@ -125,6 +120,9 @@ fn main() {
                 .send_wildcard()
                 .resource("/game", |r| r.method(Method::GET).f(create))
                 .resource("/game/{game_id}", |r| r.method(Method::GET).f(show))
+                .resource("/game/{game_id}/start", |r| r.method(Method::GET).with(update))
+                .resource("/game/{game_id}/tiles", |r| r.method(Method::GET).with(draw))
+                .resource("/game/{game_id}/play", |r| r.method(Method::POST).with(play))
                 .resource("/game/{game_id}/players", |r| r.method(Method::POST).with(create_player))
                 .register()
         })

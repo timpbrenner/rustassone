@@ -3,10 +3,27 @@ use diesel::insert_into;
 
 use models::*;
 use lib::*;
+use serde_json;
+use actix_web::{Responder, HttpRequest, HttpResponse, Error};
 
 #[derive(Serialize)]
 pub struct JsPlayer {
     pub id: i32,
+}
+
+/// Responder
+impl Responder for JsPlayer {
+    type Item = HttpResponse;
+    type Error = Error;
+
+    fn respond_to<S>(self, req: &HttpRequest<S>) -> Result<HttpResponse, Error> {
+        let body = serde_json::to_string(&self)?;
+
+        // Create response and set content type
+        Ok(HttpResponse::Ok()
+            .content_type("application/json")
+            .body(body))
+    }
 }
 
 pub fn join_game(current_game_id: i32, sign_in_name: String) -> JsPlayer {

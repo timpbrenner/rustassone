@@ -19,6 +19,20 @@ pub struct JsTile {
     pub columnOffset: i32,
 }
 
+impl Responder for JsTile {
+    type Item = HttpResponse;
+    type Error = Error;
+
+    fn respond_to<S>(self, req: &HttpRequest<S>) -> Result<HttpResponse, Error> {
+        let body = serde_json::to_string(&self)?;
+
+        // Create response and set content type
+        Ok(HttpResponse::Ok()
+            .content_type("application/json")
+            .body(body))
+    }
+}
+
 #[derive(Serialize)]
 pub struct JsGame {
     pub id: i32,
@@ -27,7 +41,6 @@ pub struct JsGame {
     pub currentState: String,
 }
 
-/// Responder
 impl Responder for JsGame {
     type Item = HttpResponse;
     type Error = Error;
@@ -42,6 +55,7 @@ impl Responder for JsGame {
     }
 }
 
+#[derive(Deserialize)]
 pub struct TilePlay {
     pub tile_id: Option<i32>,
     pub player_id: Option<i32>,
@@ -83,7 +97,7 @@ pub fn get_game(game_id: i32) -> JsGame {
     JsGame { id: game.id, grid: grid, currentPlayerId: game.current_player_id.unwrap_or(-1), currentState: game.current_state.unwrap_or("draw".to_owned()) }
 }
 
-pub fn draw_tile(current_game_id: String) -> JsTile {
+pub fn draw_tile(current_game_id: i32) -> JsTile {
     let connection = establish_connection();
     let sql = format!("SELECT t.* FROM tiles t \
                     LEFT JOIN game_tiles gt ON gt.tile_id = t.id and gt.game_id = {} \

@@ -149,12 +149,7 @@ var app = new Vue({
         contentType: 'application/json',
         data: JSON.stringify({ username: $('#username').val() }),
         success: this.joinPlayer,
-        error: function(e, status, message) {
-          console.log('Player Join Fail');
-          console.log(e);
-          console.log(status);
-          console.log(message);
-        },
+        error: function(e) { console.log('Player Join Fail'); },
       });
     },
     joinPlayer: function(data) {
@@ -169,12 +164,14 @@ var app = new Vue({
       $.ajax({
         url: 'http://localhost:8088/game/' + this.gameId + '/start',
         success: this.updateGrid,
+        error: function(e) { console.log('Start Fail'); },
       });
     },
     draw: function() {
       $.ajax({
-        url: 'http://localhost:8088/game/' + this.gameId + '/draw',
+        url: 'http://localhost:8088/game/' + this.gameId + '/tiles',
         success: this.drawTile,
+        error: function(e) { console.log('Draw Fail'); },
       });
     },
     drawTile: function(tile) {
@@ -198,14 +195,17 @@ var app = new Vue({
     },
     playTile: function(row, column, rowOffset, columnOffset) {
       $.ajax({
+        method: 'POST',
         url: 'http://localhost:8088/game/' + this.gameId + '/play',
-        data: {
+        contentType: 'application/json',
+        data: JSON.stringify({
           tile_id: this.currentTile.id,
           player_id: this.playerId,
           row_offset: rowOffset,
           column_offset: columnOffset,
-        },
-        success: function(d) { }
+        }),
+        success: function(d) { console.log('played'); },
+        error: function(d) { console.log('Error playing tile'); }
       });
 
       this.placeTile(row, column);
