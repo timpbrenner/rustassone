@@ -11,10 +11,6 @@ module.exports = {
     './src_js/app.js'
   ],
 
-  devServer: {
-    hot: true
-  },
-
   module: {
     rules: [
       {
@@ -50,6 +46,12 @@ module.exports = {
       filename: 'index.html',
       template: 'index.html',
       inject: true
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jquery: 'jquery',
+      'window.jQuery': 'jquery',
+      jQuery: 'jquery'
     })
   ]
 }

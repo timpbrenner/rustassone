@@ -41,7 +41,10 @@
 </template>
 
 <script>
+import TileRow from './components/TileRow.vue'
+
 export default {
+  components: { TileRow },
   data() {
     return  {
       state: 'draw',
@@ -52,17 +55,14 @@ export default {
     };
   },
   created() {
-    return function () {
-      $.ajax({
-        url: 'http://localhost:8088/game/' + this.gameId,
-        success: this.updateGrid,
-        error: function() {console.log('CREATED GAME ERROR')},
-      });
-    };
+    $.ajax({
+      url: 'http://localhost:8088/game/' + this.gameId,
+      success: this.updateGrid,
+      error: function() {console.log('CREATED GAME ERROR')},
+    });
   },
   methods: {
-    join: function() {
-      console.log($('#username').val());
+    join() {
       $.ajax({
         method: 'POST',
         url: 'http://localhost:8088/game/' + this.gameId + '/players',
@@ -72,33 +72,34 @@ export default {
         error: function(e) { console.log('Player Join Fail'); },
       });
     },
-    joinPlayer: function(data) {
+    joinPlayer(data) {
       this.playerId = data.id;
     },
-    updateGrid: function(data) {
+    updateGrid(data) {
+      console.log('UPDATE GRID');
       this.grid = data.grid;
       this.state = data.currentState;
       this.currentTurn = data.currentPlayerId;
     },
-    start: function() {
+    start() {
       $.ajax({
         url: 'http://localhost:8088/game/' + this.gameId + '/start',
         success: this.updateGrid,
         error: function(e) { console.log('Start Fail'); },
       });
     },
-    draw: function() {
+    draw() {
       $.ajax({
         url: 'http://localhost:8088/game/' + this.gameId + '/tiles',
         success: this.drawTile,
         error: function(e) { console.log('Draw Fail'); },
       });
     },
-    drawTile: function(tile) {
+    drawTile(tile) {
       this.currentTile = Object.assign({}, tile, { playerId: this.playerId });
       this.state = 'action';
     },
-    getTile: function(row, column) {
+    getTile(row, column) {
       const rowObj = this.grid[row];
       if (!rowObj) return {};
 
@@ -107,13 +108,13 @@ export default {
 
       return tile;
     },
-    rotateTile: function() {
+    rotateTile() {
       this.currentTile = Object.assign({}, this.currentTile, {
         cities: _.flatMap(this.currentTile.cities, function(side) { return (side + 1) % 4; }),
         roads: _.flatMap(this.currentTile.roads, function(side) { return (side + 1) % 4; }),
       })
     },
-    playTile: function(row, column, rowOffset, columnOffset) {
+    playTile(row, column, rowOffset, columnOffset) {
       $.ajax({
         method: 'POST',
         url: 'http://localhost:8088/game/' + this.gameId + '/play',
@@ -130,7 +131,7 @@ export default {
 
       this.placeTile(row, column);
     },
-    placeTile: function(row, column) {
+    placeTile(row, column) {
       let rowOffset = 0;
       let columnOffset = 0;
       const newGrid = _.cloneDeep(this.grid);

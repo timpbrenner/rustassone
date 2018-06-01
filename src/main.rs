@@ -52,7 +52,7 @@ fn index(_req: HttpRequest) -> Result<NamedFile> {
 fn game(req: HttpRequest) -> Result<NamedFile> {
     let current_game_id = req.match_info().get("game_id").unwrap();
     println!("SHOWING GAME: {}", current_game_id);
-    Ok(NamedFile::open(Path::new("static/").join("index.html"))?)
+    Ok(NamedFile::open(Path::new("dist/").join("index.html"))?)
 }
 
 // ASSETS
@@ -61,7 +61,7 @@ fn resources(req: HttpRequest) -> Result<NamedFile> {
     let path: PathBuf = req.match_info().query("tail")?;
     println!("{:?}", path);
 
-    Ok(NamedFile::open(Path::new("static/").join(path))?)
+    Ok(NamedFile::open(Path::new("dist/").join(path))?)
 }
 
 // API CALL: Creates a game and return JSON of new game
