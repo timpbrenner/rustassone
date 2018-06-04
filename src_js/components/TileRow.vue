@@ -3,6 +3,7 @@
     <tile
       v-for="(tile, index) in row"
       v-bind:tile="tile"
+      v-bind:road-hovers="roadHovers"
       v-bind:current-tile="currentTile"
       v-bind:get-tile="getTile"
       v-bind:play-tile="playTile"
@@ -17,7 +18,7 @@
 import Tile from './Tile.vue'
 
 export default {
-  props: ['row', 'rowIndex', 'playTile', 'getTile', 'currentTile'],
+  props: ['row', 'rowIndex', 'playTile', 'getTile', 'currentTile', 'roadHovers'],
   components: { Tile },
 }
 </script>

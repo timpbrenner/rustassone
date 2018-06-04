@@ -1,20 +1,22 @@
 <template>
   <div v-bind:class="classes"
-    @mouseover="checkHover"
+    @mouseover="hover = true"
     @mouseout="hover = false"
     @click="play"
-  />
+  >
+    <div class="road-top" />
+    <div class="road-right" />
+    <div class="road-bottom" />
+    <div class="road-left" />
+  </div>
 </template>
 
 <script>
 import TileHelper from '../tile_helper.js'
 
 export default {
-  props: ['tile', 'playTile', 'getTile', 'row', 'column', 'currentTile'],
+  props: ['tile', 'playTile', 'getTile', 'row', 'column', 'currentTile', 'roadHoavers'],
   methods: {
-    checkHover: function() {
-      this.hover = true;
-    },
     anySurround() {
       return this.getTile(this.row - 1, this.column).playerId ||
         this.getTile(this.row, this.column - 1).playerId ||

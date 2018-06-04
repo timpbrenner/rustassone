@@ -27,21 +27,12 @@ module.exports = {
           'vue-style-loader',
           'css-loader'
         ]
-      },
-      {
-        test: /\.styl(us)?$/,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-          'stylus-loader'
-        ]
       }
     ]
   },
 
   plugins: [
     new VueLoaderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',

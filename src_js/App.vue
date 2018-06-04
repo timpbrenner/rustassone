@@ -26,6 +26,7 @@
     <div class='game' v-if="grid">
       <tile-row
         v-for="(row, index) in grid"
+        v-bind:road-hovers="roadHovers"
         v-bind:row="row"
         v-bind:row-index="index"
         v-bind:current-tile="currentTile"
@@ -51,6 +52,7 @@ export default {
       currentTile: null,
       playerId: null,
       grid: null,
+      roadHovers: {},
       gameId: window.location.pathname.split('/').pop(),
     };
   },
@@ -76,7 +78,6 @@ export default {
       this.playerId = data.id;
     },
     updateGrid(data) {
-      console.log('UPDATE GRID');
       this.grid = data.grid;
       this.state = data.currentState;
       this.currentTurn = data.currentPlayerId;
@@ -130,6 +131,12 @@ export default {
       });
 
       this.placeTile(row, column);
+    },
+    hoverTile(tile) {
+      this.roadHovers = { 4: [1] };
+    },
+    clearHoverTile() {
+      this.roadHovers = {};
     },
     placeTile(row, column) {
       let rowOffset = 0;
