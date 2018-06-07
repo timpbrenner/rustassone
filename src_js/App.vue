@@ -32,6 +32,8 @@
         v-bind:current-tile="currentTile"
         v-bind:get-tile="getTile"
         v-bind:play-tile="playTile"
+        v-bind:hover-tile="hoverTile"
+        v-bind:clear-hover-tile="clearHoverTile"
         v-bind:key="index">
       </tile-row>
     </div>
@@ -43,16 +45,17 @@
 
 <script>
 import TileRow from './components/TileRow.vue'
+import CurrentTile from './components/CurrentTile.vue'
 
 export default {
-  components: { TileRow },
+  components: { TileRow, CurrentTile },
   data() {
     return  {
       state: 'draw',
       currentTile: null,
       playerId: null,
       grid: null,
-      roadHovers: {},
+      roadHovers: { 4: [1] },
       gameId: window.location.pathname.split('/').pop(),
     };
   },

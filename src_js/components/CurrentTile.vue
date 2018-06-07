@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import TileHelper from '../tile_helper.js'
+
 export default {
   props: ['currentTile', 'rotateTile'],
   methods: {
