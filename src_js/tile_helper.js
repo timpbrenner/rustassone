@@ -34,32 +34,22 @@ const TileHelper = {
      (!left.playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(left, 1));
   },
 
-  getRoadInfo(grid, row, column, side, playerId, roadData = { ends: false, roadCount: 1, players: {}, hovers: {} }) {
+  getRoadInfo(grid, row, column, side, playerId, roadData = { ends: false, players: {}, hovers: {} }) {
     const tile = TileHelper.getTile(grid, row, column);
 
-    console.log('Get Road Info ------------');
-    console.log('Row: ' + row + ' Column: ' + column + ' Side: ' + side);
+    console.log('Get Road Info -- Row: ' + row + ' Column: ' + column + ' Side: ' + side);
     console.log(roadData);
-    console.log(tile);
 
     // Recursive Case
-    if (_.includes(hovers[tile.id], side)) {
-      console.log('NO RECURSE, ALREADY EXISTS');
-
+    if (_.includes(roadData.hovers[tile.id], side)) {
       return roadData;
     }
 
     if (!tile || !tile.id) {
-      console.log('NO RECURSE, REACHED END');
-
       return Object.assign(roadData, { ends: true });
     }
-    console.log('RECURSE');
 
-    // ROAD COUNT
-    let newroadData = Object.assign({}, roadData, {
-      roadCount: roadData.roadCount + 1,
-    });
+    let newroadData = Object.assign({}, roadData);
 
     // PLAYERS
     if (playerId && !_.includes(newroadData.players, playerId)) {
@@ -67,23 +57,25 @@ const TileHelper = {
     }
 
     // HOVERS
-    newroadData.hovers = Object.assign(
-      newroadData.hovers,
-      {
-        [tile.id]: newroadData.hovers.push(side),
-      }
-    );
+    if (!newroadData.hovers[tile.id]) {
+      newroadData.hovers[tile.id] = [side];
+    } else {
+      newroadData.hovers[tile.id].push(side)
+    }
 
     _.each(tile.roads, (rSide) => {
-      newroadData = TileHelper.getRoadInfo(grid, tile, rSide, playerId, newroadData);
+      if (!_.includes(roadData.hovers[tile.id], rSide)) {
+        newroadData = TileHelper.getRoadInfo(grid, row, column, rSide, playerId, newroadData);
+        return;
+      }
 
-      if (side == 0) {
+      if (rSide == 0) {
         newroadData = TileHelper.getRoadInfo(grid, row - 1, column, 2, playerId, newroadData);
-      } else if (side == 1) {
+      } else if (rSide == 1) {
         newroadData = TileHelper.getRoadInfo(grid, row, column + 1, 3, playerId, newroadData);
-      } else if (side == 2) {
+      } else if (rSide == 2) {
         newroadData = TileHelper.getRoadInfo(grid, row + 1, column, 0, playerId, newroadData);
-      } else if (side == 3) {
+      } else if (rSide == 3) {
         newroadData = TileHelper.getRoadInfo(grid, row, column - 1, 1, playerId, newroadData);
       }
     });
@@ -92,7 +84,7 @@ const TileHelper = {
   },
 
   getTile(grid, row, column) {
-    const rowObj = this.grid[row];
+    const rowObj = grid[row];
     if (!rowObj) return {};
 
     const tile = rowObj[column];

@@ -46,6 +46,7 @@
 <script>
 import TileRow from './components/TileRow.vue'
 import CurrentTile from './components/CurrentTile.vue'
+import TileHelper from './tile_helper.js'
 
 export default {
   components: { TileRow, CurrentTile },
@@ -55,7 +56,7 @@ export default {
       currentTile: null,
       playerId: null,
       grid: null,
-      roadHovers: { 4: [1] },
+      roadHovers: {},
       gameId: window.location.pathname.split('/').pop(),
     };
   },
@@ -135,8 +136,18 @@ export default {
 
       this.placeTile(row, column);
     },
-    hoverTile(tile) {
-      this.roadHovers = { 4: [1] };
+    hoverTile(tile, row, column, side) {
+      if (!tile.playerId) {
+        return;
+      }
+
+      console.log('**********')
+      const result = TileHelper.getRoadInfo(this.grid, row, column, side, this.playerId);
+      console.log('RESULT *************');
+      console.log(result);
+      console.log('**********');
+
+      this.roadHovers = result.hovers;
     },
     clearHoverTile() {
       this.roadHovers = {};

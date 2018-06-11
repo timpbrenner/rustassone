@@ -52,7 +52,7 @@ fn index(_req: HttpRequest) -> Result<NamedFile> {
 fn game(req: HttpRequest) -> Result<NamedFile> {
     let current_game_id = req.match_info().get("game_id").unwrap();
     println!("SHOWING GAME: {}", current_game_id);
-    Ok(NamedFile::open(Path::new("dist/").join("index.html"))?)
+    Ok(NamedFile::open(Path::new("static/").join("index.html"))?)
 }
 
 // ASSETS

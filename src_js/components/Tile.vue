@@ -31,7 +31,7 @@ export default {
       this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset)
     },
     mouseOver() {
-      this.hoverTile(this.tile);
+      this.hoverTile(this.tile, this.row, this.column, 0);
       this.hover = true;
     },
     mouseOut() {
