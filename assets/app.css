@@ -83,7 +83,7 @@
 .tile.left-farm, .current-tile.left-farm { border-left: 4px solid green; }
 
 .road-top {
-  background: red;
+  background: black;
   height: 58px;
   left: 42px;
   position: absolute;
@@ -92,7 +92,7 @@
 }
 
 .road-bottom {
-  background: red;
+  background: black;
   height: 58px;
   position: absolute;
   left: 42px;
@@ -101,7 +101,7 @@
 }
 
 .road-right {
-  background: red;
+  background: black;
   height: 16px;
   position: absolute;
   right: 0;
@@ -110,10 +110,17 @@
 }
 
 .road-left {
-  background: red;
+  background: black;
   height: 16px;
   position: absolute;
   left: 0;
   top: 42px;
   width: 58px;
+}
+
+.road-top-hover,
+.road-bottom-hover,
+.road-right-hover,
+.road-left-hover {
+  background: red;
 }

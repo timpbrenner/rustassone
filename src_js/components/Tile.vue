@@ -4,10 +4,10 @@
     @mouseout="mouseOut"
     @click="play"
   >
-    <div v-if="showRoad(0)" class="road-top" />
-    <div v-if="showRoad(1)" class="road-right" />
-    <div v-if="showRoad(2)" class="road-bottom" />
-    <div v-if="showRoad(3)" class="road-left" />
+    <div v-bind:class="innerComponentClasses(0)" />
+    <div v-bind:class="innerComponentClasses(1)" />
+    <div v-bind:class="innerComponentClasses(2)" />
+    <div v-bind:class="innerComponentClasses(3)" />
   </div>
 </template>
 
@@ -38,8 +38,17 @@ export default {
       this.clearHoverTile();
       this.hover = false;
     },
-    showRoad(side) {
-      return _.includes(this.roadHovers[this.tile.id], side)
+    innerComponentClasses(side) {
+      const sideName = ['top', 'right', 'bottom', 'left'][side];
+
+      if (_.includes(this.tile.roads, side)) {
+        if (_.includes(this.roadHovers[this.tile.id], side)) {
+          return 'road-' + sideName + ' road-' + sideName + '-hover';
+        }
+
+        return 'road-' + sideName;
+      } else if (_.includes(this.tile.roads, side)) {
+      }
     }
   },
   data: function() {
@@ -68,7 +77,7 @@ export default {
       }
 
       return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
-    }
+    },
   }
 }
 </script>

@@ -69,15 +69,18 @@ const TileHelper = {
         return;
       }
 
-      if (rSide == 0) {
-        newroadData = TileHelper.getRoadInfo(grid, row - 1, column, 2, playerId, newroadData);
-      } else if (rSide == 1) {
-        newroadData = TileHelper.getRoadInfo(grid, row, column + 1, 3, playerId, newroadData);
-      } else if (rSide == 2) {
-        newroadData = TileHelper.getRoadInfo(grid, row + 1, column, 0, playerId, newroadData);
-      } else if (rSide == 3) {
-        newroadData = TileHelper.getRoadInfo(grid, row, column - 1, 1, playerId, newroadData);
-      }
+      const rowOffset = [-1, 0, 1, 0];
+      const columnOffset = [0, 1, 0, -1];
+      const mirrorSide = [2, 3, 0, 1];
+
+      newroadData = TileHelper.getRoadInfo(
+        grid,
+        row + rowOffset[rSide],
+        column + columnOffset[rSide],
+        mirrorSide[rSide],
+        playerId,
+        newroadData
+      );
     });
 
     return newroadData;
