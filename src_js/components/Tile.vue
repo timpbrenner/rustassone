@@ -47,7 +47,12 @@ export default {
         }
 
         return 'road-' + sideName;
-      } else if (_.includes(this.tile.roads, side)) {
+      } else if (_.includes(this.tile.cities, side)) {
+        // if (_.includes(this.cityHovers[this.tile.id], side)) {
+        //   return 'city-' + sideName + ' city-' + sideName + '-hover';
+        // }
+
+        return 'city-' + sideName;
       }
     }
   },
