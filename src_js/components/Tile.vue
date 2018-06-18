@@ -1,13 +1,25 @@
 <template>
-  <div v-bind:class="classes"
-    @mouseover="mouseOver"
-    @mouseout="mouseOut"
-    @click="play"
-  >
-    <div v-bind:class="innerComponentClasses(0)" />
-    <div v-bind:class="innerComponentClasses(1)" />
-    <div v-bind:class="innerComponentClasses(2)" />
-    <div v-bind:class="innerComponentClasses(3)" />
+  <div v-bind:class="classes" @click="play">
+    <div
+      @mouseover="mouseOver(0)"
+      @mouseout="mouseOut"
+      v-bind:class="innerComponentClasses(0)"
+    />
+    <div
+      @mouseover="mouseOver(1)"
+      @mouseout="mouseOut"
+      v-bind:class="innerComponentClasses(1)"
+    />
+    <div
+      @mouseover="mouseOver(2)"
+      @mouseout="mouseOut"
+      v-bind:class="innerComponentClasses(2)"
+    />
+    <div
+      @mouseover="mouseOver(3)"
+      @mouseout="mouseOut"
+      v-bind:class="innerComponentClasses(3)"
+    />
   </div>
 </template>
 
@@ -30,8 +42,8 @@ export default {
 
       this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset)
     },
-    mouseOver() {
-      this.hoverTile(this.tile, this.row, this.column, 0);
+    mouseOver(side) {
+      this.hoverTile(this.tile, this.row, this.column, side);
       this.hover = true;
     },
     mouseOut() {
