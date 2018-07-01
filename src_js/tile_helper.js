@@ -1,6 +1,7 @@
 const TileHelper = {
   sideType(tile, side) {
-    if (tile.cities.indexOf(side) >= 0) { return 1;
+    if (tile.cities.indexOf(side) >= 0) {
+      return 1;
     } else if (tile.roads.indexOf(side) >= 0) {
       return 2;
     }
@@ -34,38 +35,42 @@ const TileHelper = {
      (!left.playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(left, 1));
   },
 
-  getRoadInfo(grid, row, column, side, playerId, roadData = { ends: false, players: {}, hovers: {} }) {
+  getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: {}, hovers: {} }) {
     const tile = TileHelper.getTile(grid, row, column);
 
-    console.log('Get Road Info -- Row: ' + row + ' Column: ' + column + ' Side: ' + side);
-    console.log(roadData);
-
     // Recursive Case
-    if (_.includes(roadData.hovers[tile.id], side)) {
-      return roadData;
+    if (_.includes(hoverData.hovers[tile.id], side)) {
+      return hoverData;
     }
 
     if (!tile || !tile.id) {
-      return Object.assign(roadData, { ends: true });
+      return Object.assign(hoverData, { ends: true });
     }
 
-    let newroadData = Object.assign({}, roadData);
+    let newHoverData = Object.assign({}, hoverData);
 
     // PLAYERS
-    if (playerId && !_.includes(newroadData.players, playerId)) {
-      newroadData.players.push(playerId);
+    if (playerId && !_.includes(newHoverData.players, playerId)) {
+      newHoverData.players.push(playerId);
     }
 
     // HOVERS
-    if (!newroadData.hovers[tile.id]) {
-      newroadData.hovers[tile.id] = [side];
+    if (!newHoverData.hovers[tile.id]) {
+      newHoverData.hovers[tile.id] = [side];
     } else {
-      newroadData.hovers[tile.id].push(side)
+      newHoverData.hovers[tile.id].push(side)
     }
 
-    _.each(tile.roads, (rSide) => {
-      if (!_.includes(roadData.hovers[tile.id], rSide)) {
-        newroadData = TileHelper.getRoadInfo(grid, row, column, rSide, playerId, newroadData);
+    let sides = [];
+    if (sideType === 2) {
+      sides = tile.roads;
+    } else if (sideType === 1) {
+      sides = tile.cities;
+    }
+
+    _.each(sides, (rSide) => {
+      if (!_.includes(hoverData.hovers[tile.id], rSide)) {
+        newHoverData = TileHelper.getHoverInfo(grid, row, column, rSide, playerId, sideType, newHoverData);
         return;
       }
 
@@ -73,13 +78,14 @@ const TileHelper = {
       const columnOffset = [0, 1, 0, -1];
       const mirrorSide = [2, 3, 0, 1];
 
-      newroadData = TileHelper.getRoadInfo(
+      newroadData = TileHelper.getHoverInfo(
         grid,
         row + rowOffset[rSide],
         column + columnOffset[rSide],
         mirrorSide[rSide],
         playerId,
-        newroadData
+        sideType,
+        newHoverData
       );
     });
 

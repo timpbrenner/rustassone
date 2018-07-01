@@ -28,7 +28,7 @@ import TileHelper from '../tile_helper.js'
 import _ from 'lodash'
 
 export default {
-  props: ['tile', 'playTile', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'roadHovers'],
+  props: ['tile', 'playTile', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'roadHovers', 'cityHovers'],
   methods: {
     anySurround() {
       return this.getTile(this.row - 1, this.column).playerId ||
@@ -40,10 +40,12 @@ export default {
       if (!this.anySurround()) { return; }
       if (!TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column)) { return; }
 
-      this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset)
+      this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset);
     },
     mouseOver(side) {
-      this.hoverTile(this.tile, this.row, this.column, side);
+      const sideType = TileHelper.sideType(this.tile, side);
+
+      this.hoverTile(this.tile, this.row, this.column, side, sideType);
       this.hover = true;
     },
     mouseOut() {
@@ -52,17 +54,18 @@ export default {
     },
     innerComponentClasses(side) {
       const sideName = ['top', 'right', 'bottom', 'left'][side];
+      const sideType = TileHelper.sideType(this.tile, side);
 
-      if (_.includes(this.tile.roads, side)) {
+      if (sideType === 2) {
         if (_.includes(this.roadHovers[this.tile.id], side)) {
           return 'road-' + sideName + ' road-' + sideName + '-hover';
         }
 
         return 'road-' + sideName;
-      } else if (_.includes(this.tile.cities, side)) {
-        // if (_.includes(this.cityHovers[this.tile.id], side)) {
-        //   return 'city-' + sideName + ' city-' + sideName + '-hover';
-        // }
+      } else if (sideType === 1) {
+        if (_.includes(this.cityHovers[this.tile.id], side)) {
+          return 'city-' + sideName + ' city-' + sideName + '-hover';
+        }
 
         return 'city-' + sideName;
       }
@@ -73,13 +76,11 @@ export default {
   },
   computed: {
     classes: function() {
-      let klasses = ["tile"];
-
       if (this.tile.playerId) {
-        klasses.push("played");
-        return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
+        return 'tile played';
       }
 
+      const klasses = ["tile"];
       const matches = this.currentTile && this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
       const surround = this.anySurround();
 
@@ -93,7 +94,7 @@ export default {
         klasses.push("active");
       }
 
-      return klasses.concat(TileHelper.sideClasses(this.tile)).join(' ');
+      return klasses.join(' ');
     },
   }
 }

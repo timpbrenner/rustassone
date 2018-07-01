@@ -27,6 +27,7 @@
       <tile-row
         v-for="(row, index) in grid"
         v-bind:road-hovers="roadHovers"
+        v-bind:city-hovers="cityHovers"
         v-bind:row="row"
         v-bind:row-index="index"
         v-bind:current-tile="currentTile"
@@ -57,6 +58,7 @@ export default {
       playerId: null,
       grid: null,
       roadHovers: {},
+      cityHovers: {},
       gameId: window.location.pathname.split('/').pop(),
     };
   },
@@ -136,21 +138,22 @@ export default {
 
       this.placeTile(row, column);
     },
-    hoverTile(tile, row, column, side) {
+    hoverTile(tile, row, column, side, sideType) {
       if (!tile.playerId) {
         return;
       }
 
-      console.log('**********')
-      const result = TileHelper.getRoadInfo(this.grid, row, column, side, this.playerId);
-      console.log('RESULT *************');
-      console.log(result);
-      console.log('**********');
-
-      this.roadHovers = result.hovers;
+      if (sideType === 2) {
+        const result = TileHelper.getHoverInfo(this.grid, row, column, side, this.playerId, sideType);
+        this.roadHovers = result.hovers;
+      } else if (sideType === 1) {
+        const result = TileHelper.getHoverInfo(this.grid, row, column, side, this.playerId, sideType);
+        this.cityHovers = result.hovers;
+      }
     },
     clearHoverTile() {
       this.roadHovers = {};
+      this.cityHovers = {};
     },
     placeTile(row, column) {
       let rowOffset = 0;
