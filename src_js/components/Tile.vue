@@ -1,23 +1,28 @@
 <template>
   <div v-bind:class="classes" @click="play">
+    <div v-bind:class="meeplePlacement()" />
     <div
       @mouseover="mouseOver(0)"
       @mouseout="mouseOut"
+      @click="placeMeeple(0)"
       v-bind:class="innerComponentClasses(0)"
     />
     <div
       @mouseover="mouseOver(1)"
       @mouseout="mouseOut"
+      @click="placeMeeple(1)"
       v-bind:class="innerComponentClasses(1)"
     />
     <div
       @mouseover="mouseOver(2)"
       @mouseout="mouseOut"
+      @click="placeMeeple(2)"
       v-bind:class="innerComponentClasses(2)"
     />
     <div
       @mouseover="mouseOver(3)"
       @mouseout="mouseOut"
+      @click="placeMeeple(3)"
       v-bind:class="innerComponentClasses(3)"
     />
   </div>
@@ -28,7 +33,7 @@ import TileHelper from '../tile_helper.js'
 import _ from 'lodash'
 
 export default {
-  props: ['tile', 'playTile', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'roadHovers', 'cityHovers'],
+  props: ['tile', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'hoverInfo'],
   methods: {
     anySurround() {
       return this.getTile(this.row - 1, this.column).playerId ||
@@ -37,10 +42,14 @@ export default {
         this.getTile(this.row, this.column + 1).playerId;
     },
     play() {
+      if (this.tile.id) { return; }
       if (!this.anySurround()) { return; }
       if (!TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column)) { return; }
 
       this.playTile(this.row, this.column, this.tile.rowOffset, this.tile.columnOffset);
+    },
+    placeMeeple(side, e) {
+      this.playMeeple(this.tile.id, side);
     },
     mouseOver(side) {
       const sideType = TileHelper.sideType(this.tile, side);
@@ -52,18 +61,24 @@ export default {
       this.clearHoverTile();
       this.hover = false;
     },
+    meeplePlacement() {
+      // Look for meeple object on a tile (not implemented)
+      if (false) {
+        return 'meeple meeple-left';
+      }
+    },
     innerComponentClasses(side) {
       const sideName = ['top', 'right', 'bottom', 'left'][side];
       const sideType = TileHelper.sideType(this.tile, side);
 
       if (sideType === 2) {
-        if (_.includes(this.roadHovers[this.tile.id], side)) {
+        if (_.includes(this.hoverInfo.roadHovers[this.tile.id], side)) {
           return 'road-' + sideName + ' road-' + sideName + '-hover';
         }
 
         return 'road-' + sideName;
       } else if (sideType === 1) {
-        if (_.includes(this.cityHovers[this.tile.id], side)) {
+        if (_.includes(this.hoverInfo.cityHovers[this.tile.id], side)) {
           return 'city-' + sideName + ' city-' + sideName + '-hover';
         }
 

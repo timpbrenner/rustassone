@@ -35,11 +35,12 @@ const TileHelper = {
      (!left.playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(left, 1));
   },
 
-  getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: {}, hovers: {} }) {
+  getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: {}, roadHovers: {}, cityHovers: {} }) {
     const tile = TileHelper.getTile(grid, row, column);
+    const hoverKey = sideType === 2 ? 'roadHovers' : 'cityHovers';
 
     // Recursive Case
-    if (_.includes(hoverData.hovers[tile.id], side)) {
+    if (_.includes(hoverData[hoverKey][tile.id], side)) {
       return hoverData;
     }
 
@@ -55,10 +56,10 @@ const TileHelper = {
     }
 
     // HOVERS
-    if (!newHoverData.hovers[tile.id]) {
-      newHoverData.hovers[tile.id] = [side];
+    if (!newHoverData[hoverKey][tile.id]) {
+      newHoverData[hoverKey][tile.id] = [side];
     } else {
-      newHoverData.hovers[tile.id].push(side)
+      newHoverData[hoverKey][tile.id].push(side)
     }
 
     let sides = [];
@@ -69,7 +70,7 @@ const TileHelper = {
     }
 
     _.each(sides, (rSide) => {
-      if (!_.includes(hoverData.hovers[tile.id], rSide)) {
+      if (!_.includes(hoverData[hoverKey][tile.id], rSide)) {
         newHoverData = TileHelper.getHoverInfo(grid, row, column, rSide, playerId, sideType, newHoverData);
         return;
       }

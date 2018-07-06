@@ -63,37 +63,37 @@
   background-color: #FF0000;
 }
 
-.road-top {
+.road-top,
+.road-bottom,
+.road-right,
+.road-left {
   background: black;
+  position: absolute;
+}
+
+.road-top {
   height: 58px;
   left: 42px;
-  position: absolute;
   top: 0;
   width: 16px;
 }
 
 .road-bottom {
-  background: black;
   height: 58px;
-  position: absolute;
   left: 42px;
   top: 42px;
   width: 16px;
 }
 
 .road-right {
-  background: black;
   height: 16px;
-  position: absolute;
   right: 0;
   top: 42px;
   width: 58px;
 }
 
 .road-left {
-  background: black;
   height: 16px;
-  position: absolute;
   left: 0;
   top: 42px;
   width: 58px;
@@ -142,5 +142,34 @@
 .city-left {
   left: -50px;
   top: 0;
+}
+
+.meeple {
+  background: red;
+  border-radius: 26px;
+  height: 26px;
+  position: absolute;
+  width: 26px;
+  z-index: 100;
+}
+
+.meeple-top {
+  left: 37px;
+  top: 5px;
+}
+
+.meeple-right {
+  right: 5px;
+  top: 37px;
+}
+
+.meeple-bottom {
+  bottom: 5px;
+  left: 37px;
+}
+
+.meeple-left {
+  left: 5px;
+  top: 37px;
 }
 

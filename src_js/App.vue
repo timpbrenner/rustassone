@@ -26,13 +26,13 @@
     <div class='game' v-if="grid">
       <tile-row
         v-for="(row, index) in grid"
-        v-bind:road-hovers="roadHovers"
-        v-bind:city-hovers="cityHovers"
+        v-bind:hover-info="hoverInfo"
         v-bind:row="row"
         v-bind:row-index="index"
         v-bind:current-tile="currentTile"
         v-bind:get-tile="getTile"
         v-bind:play-tile="playTile"
+        v-bind:play-meeple="playMeeple"
         v-bind:hover-tile="hoverTile"
         v-bind:clear-hover-tile="clearHoverTile"
         v-bind:key="index">
@@ -57,8 +57,7 @@ export default {
       currentTile: null,
       playerId: null,
       grid: null,
-      roadHovers: {},
-      cityHovers: {},
+      hoverInfo: { roadHovers: {}, cityHovers: {} },
       gameId: window.location.pathname.split('/').pop(),
     };
   },
@@ -138,22 +137,32 @@ export default {
 
       this.placeTile(row, column);
     },
+    playMeeple(tileId, side) {
+      $.ajax({
+        method: 'POST',
+        url: 'http://localhost:8088/game/' + this.gameId + '/meeple',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          player_id: this.playerId,
+          tile_id: tileId,
+          side: side,
+        }),
+        success: function(d) { console.log('played meeple'); },
+        error: function(d) { console.log('Error playing meeple'); }
+      });
+    },
     hoverTile(tile, row, column, side, sideType) {
       if (!tile.playerId) {
         return;
       }
 
-      if (sideType === 2) {
-        const result = TileHelper.getHoverInfo(this.grid, row, column, side, this.playerId, sideType);
-        this.roadHovers = result.hovers;
-      } else if (sideType === 1) {
-        const result = TileHelper.getHoverInfo(this.grid, row, column, side, this.playerId, sideType);
-        this.cityHovers = result.hovers;
-      }
+      this.hoverInfo = TileHelper.getHoverInfo(this.grid, row, column, side, this.playerId, sideType);
     },
     clearHoverTile() {
-      this.roadHovers = {};
-      this.cityHovers = {};
+      this.hoverInfo = {
+        roadHovers: {},
+        cityHovers: {},
+      };
     },
     placeTile(row, column) {
       let rowOffset = 0;

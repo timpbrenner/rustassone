@@ -109,6 +109,16 @@ fn play(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
     play_tile(path.game_id, play.into_inner())
 }
 
+// API CALL: Play a tile
+fn place_meeple(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
+    println!("PLAY MEEPLE");
+
+    let (path, play) = data;
+    println!("PLAY MEEPLE: {}, {}", path.game_id, play.tile_id.unwrap());
+
+    play_meeple(path.game_id, play.into_inner())
+}
+
 fn main() {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
@@ -124,6 +134,7 @@ fn main() {
                 .resource("/game/{game_id}/tiles", |r| r.method(Method::GET).with(draw))
                 .resource("/game/{game_id}/play", |r| r.method(Method::POST).with(play))
                 .resource("/game/{game_id}/players", |r| r.method(Method::POST).with(create_player))
+                .resource("/game/{game_id}/meeple", |r| r.method(Method::POST).with(place_meeple))
                 .register()
         })
         .resource(r"/a/{tail:.*}", |r| r.method(Method::GET).f(resources))

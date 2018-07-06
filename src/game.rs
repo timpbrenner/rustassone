@@ -63,6 +63,13 @@ pub struct TilePlay {
     pub column_offset: Option<i32>
 }
 
+#[derive(Deserialize)]
+pub struct MeeplePlay {
+    pub tile_id: Option<i32>,
+    pub player_id: Option<i32>,
+    pub side: Option<i32>,
+}
+
 pub fn create_game() -> JsGame {
     use schema::games::dsl::*;
 
@@ -124,6 +131,17 @@ pub fn play_tile(play_game_id: i32, play: TilePlay) -> JsTile {
         ).execute(&conn);
 
     JsTile { id: 1, playerId: 0, cities: Vec::new(), roads: Vec::new(), columnOffset: 0, rowOffset: 0 }
+}
+
+pub fn play_meeple(game_id: i32, play: MeeplePlay) -> JsGame {
+    use schema::tiles::dsl::*;
+
+    let connection = establish_connection();
+    let target = tiles.filter(::schema::tiles::dsl::id.eq(play.tile_id.unwrap()));
+
+    // update(target).set(current_state.eq("draw")).execute(&connection);
+
+    get_game(game_id)
 }
 
 // Private
