@@ -83,6 +83,10 @@ export default {
       this.playerId = data.id;
     },
     updateGrid(data) {
+      console.log('----------');
+      console.log(data);
+      console.log('----------');
+
       this.grid = data.grid;
       this.state = data.currentState;
       this.currentTurn = data.currentPlayerId;

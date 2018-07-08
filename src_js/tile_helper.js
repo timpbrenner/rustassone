@@ -35,7 +35,7 @@ const TileHelper = {
      (!left.playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(left, 1));
   },
 
-  getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: {}, roadHovers: {}, cityHovers: {} }) {
+  getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: [], roadHovers: {}, cityHovers: {} }) {
     const tile = TileHelper.getTile(grid, row, column);
     const hoverKey = sideType === 2 ? 'roadHovers' : 'cityHovers';
 

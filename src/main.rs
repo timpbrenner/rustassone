@@ -8,6 +8,7 @@ extern crate env_logger;
 
 mod schema;
 mod models;
+mod js_models;
 mod lib;
 mod game;
 mod player;
@@ -27,6 +28,7 @@ use actix_web::{
 };
 
 pub use models::*;
+pub use js_models::*;
 pub use lib::*;
 pub use game::*;
 pub use player::*;
@@ -109,10 +111,8 @@ fn play(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
     play_tile(path.game_id, play.into_inner())
 }
 
-// API CALL: Play a tile
-fn place_meeple(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
-    println!("PLAY MEEPLE");
-
+// API CALL: Play a Meeple
+fn place_meeple(data: (actix_web::Path<GamePath>, Json<MeeplePlay>)) -> impl Responder {
     let (path, play) = data;
     println!("PLAY MEEPLE: {}, {}", path.game_id, play.tile_id.unwrap());
 

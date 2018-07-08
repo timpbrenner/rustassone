@@ -1,4 +1,4 @@
-CREATE TABLE meeple (
+CREATE TABLE game_pieces (
   id SERIAL PRIMARY KEY,
   tile_id INTEGER NOT NULL REFERENCES tiles (id),
   game_id INTEGER NOT NULL REFERENCES games (id),

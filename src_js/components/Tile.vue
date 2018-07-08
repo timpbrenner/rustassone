@@ -62,9 +62,9 @@ export default {
       this.hover = false;
     },
     meeplePlacement() {
-      // Look for meeple object on a tile (not implemented)
-      if (false) {
-        return 'meeple meeple-left';
+      if (this.tile.meeple && this.tile.meeple.playerId) {
+        const sideName = ['top', 'right', 'bottom', 'left'][this.tile.meeple.side];
+        return 'meeple meeple-' + sideName;
       }
     },
     innerComponentClasses(side) {

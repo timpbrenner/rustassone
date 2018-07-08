@@ -52,3 +52,12 @@ pub struct GameTile {
   pub row_offset: i32,
   pub column_offset: i32,
 }
+
+#[derive(Queryable)]
+pub struct GamePiece {
+  pub id: i32,
+  pub game_id: i32,
+  pub tile_id: i32,
+  pub player_id: i32,
+  pub side: i32,
+}

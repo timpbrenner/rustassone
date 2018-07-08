@@ -1,1 +1,1 @@
-DROP TABLE meeple;
+DROP TABLE game_pieces;
