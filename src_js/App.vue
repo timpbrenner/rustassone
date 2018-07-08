@@ -1,5 +1,14 @@
 <template>
   <div>
+    <div class="scoreboard">
+      <player
+        v-for="(player) in players"
+        v-bind:player="player"
+        v-bind:key="player.id"
+      >
+    </player>
+
+    </div>
     <div v-if="playerId === null">
       <div class="join">
         <div>JOIN MATCH</div><br />
@@ -47,16 +56,18 @@
 <script>
 import TileRow from './components/TileRow.vue'
 import CurrentTile from './components/CurrentTile.vue'
+import Player from './components/Player.vue'
 import TileHelper from './tile_helper.js'
 
 export default {
-  components: { TileRow, CurrentTile },
+  components: { TileRow, CurrentTile, Player },
   data() {
     return  {
       state: 'draw',
       currentTile: null,
       playerId: null,
       grid: null,
+      players: [],
       hoverInfo: { roadHovers: {}, cityHovers: {} },
       gameId: window.location.pathname.split('/').pop(),
     };
@@ -87,6 +98,7 @@ export default {
       console.log(data);
       console.log('----------');
 
+      this.players = data.players;
       this.grid = data.grid;
       this.state = data.currentState;
       this.currentTurn = data.currentPlayerId;

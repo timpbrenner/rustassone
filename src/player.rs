@@ -40,6 +40,8 @@ pub fn join_game(current_game_id: i32, sign_in_name: String) -> JsPlayer {
     }
     player = player_result.unwrap();
 
+    // let mut game_player_result = game_players.filter(game_id.eq(current_game_id)).get_result::<GamePlayer>(&connection).ok();
+
     insert_into(game_players)
         .values(
             (
