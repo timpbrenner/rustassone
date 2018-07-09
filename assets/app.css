@@ -173,3 +173,20 @@
   top: 37px;
 }
 
+.scoreboard {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+
+.player-score {
+  display: flex;
+  flex-direction: row;
+}
+
+.player-score .color {
+  background: red;
+  border-radius: 15px;
+  height: 15px;
+  width: 15px;
+}
