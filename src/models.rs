@@ -40,6 +40,8 @@ pub struct GamePlayer {
   pub id: i32,
   pub game_id: i32,
   pub player_id: i32,
+  pub turn_order: i32,
+  pub score: i32,
 }
 
 #[derive(Queryable)]
@@ -48,7 +50,6 @@ pub struct GameTile {
   pub game_id: i32,
   pub tile_id: i32,
   pub player_id: Option<i32>,
-  pub meeple_location: Option<i32>,
   pub row_offset: i32,
   pub column_offset: i32,
 }

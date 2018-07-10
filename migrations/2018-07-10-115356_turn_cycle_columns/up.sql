@@ -1,0 +1,6 @@
+ALTER TABLE game_players
+ADD COLUMN turn_order INTEGER DEFAULT 0 NOT NULL,
+ADD COLUMN score INTEGER DEFAULT 0 NOT NULL;
+
+ALTER TABLE game_tiles
+DROP COLUMN meeple_location;
