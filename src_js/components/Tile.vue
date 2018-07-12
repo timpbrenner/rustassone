@@ -1,5 +1,10 @@
 <template>
-  <div v-bind:class="classes" @click="play">
+  <div
+    @mouseover="tileMouseOver"
+    @mouseout="tileMouseOut"
+    v-bind:class="classes"
+    @click="play"
+  >
     <div v-bind:class="meeplePlacement()" />
     <div
       @mouseover="mouseOver(0)"
@@ -51,6 +56,12 @@ export default {
     placeMeeple(side, e) {
       this.playMeeple(this.tile.id, side);
     },
+    tileMouseOver(side) {
+      this.hover = true;
+    },
+    tileMouseOut(side) {
+      this.hover = false;
+    },
     mouseOver(side) {
       const sideType = TileHelper.sideType(this.tile, side);
 
@@ -59,7 +70,6 @@ export default {
     },
     mouseOut() {
       this.clearHoverTile();
-      this.hover = false;
     },
     meeplePlacement() {
       if (this.tile.meeple && this.tile.meeple.playerId) {
