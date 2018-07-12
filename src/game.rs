@@ -38,11 +38,8 @@ pub fn create_game() -> JsGame {
 }
 
 pub fn start_game(game_id: i32) -> JsGame {
-    use schema::games::dsl::*;
-
     let connection = establish_connection();
-    let target = games.filter(::schema::games::dsl::id.eq(game_id));
-    let _result = update(target).set(current_state.eq("draw")).execute(&connection);
+    update_game_state(game_id, "draw".to_owned(), None, &connection);
 
     get_game(game_id)
 }
@@ -69,24 +66,28 @@ pub fn draw_tile(current_game_id: i32) -> JsTile {
                     WHERE gt.id IS NULL \
                     ORDER BY random() LIMIT 1", current_game_id);
     let tile_result: std::result::Result<Tile, ::diesel::result::Error> = sql_query(sql).get_result(&connection);
+    let tile = tile_result.ok().unwrap();
 
-    get_tile(tile_result.ok().unwrap(), &connection)
+    update_game_state(current_game_id, "action".to_owned(), Some(tile.id), &connection);
+
+    get_tile(tile, &connection)
 }
 
-pub fn play_tile(play_game_id: i32, play: TilePlay) -> JsTile {
+pub fn play_tile(current_game_id: i32, play: TilePlay) -> JsTile {
     use schema::game_tiles::dsl::*;
 
     let conn = establish_connection();
-    insert_into(game_tiles)
+    let _res = insert_into(game_tiles)
         .values(
             (
-                game_id.eq(play_game_id),
+                game_id.eq(current_game_id),
                 tile_id.eq(play.tile_id.unwrap()),
                 player_id.eq(play.player_id),
                 row_offset.eq(play.row_offset.unwrap()),
                 column_offset.eq(play.column_offset.unwrap()),
             )
         ).execute(&conn);
+    update_game_state(current_game_id, "place".to_owned(), None, &conn);
 
     JsTile { id: 1, playerId: 0, cities: Vec::new(), roads: Vec::new(), columnOffset: 0, rowOffset: 0, meeple: None }
 }
@@ -95,7 +96,7 @@ pub fn play_meeple(play_game_id: i32, play: MeeplePlay) -> String  {
     use schema::game_pieces::dsl::*;
 
     let connection = establish_connection();
-    insert_into(game_pieces)
+    let _res = insert_into(game_pieces)
         .values(
             (
                 tile_id.eq(play.tile_id.unwrap()),
@@ -109,6 +110,19 @@ pub fn play_meeple(play_game_id: i32, play: MeeplePlay) -> String  {
 }
 
 // Private
+
+fn update_game_state(current_game_id: i32, state: String, tile_id: Option<i32>, connection: &PgConnection) -> String {
+    use schema::games::dsl::*;
+
+    let target = games.filter(::schema::games::dsl::id.eq(current_game_id));
+    let _res = update(target).set((
+                    current_state.eq(state),
+                    current_tile_id.eq(tile_id)
+                ))
+                .execute(connection);
+
+    "Somethig".to_owned()
+}
 
 fn build_game_grid(current_game_id: i32, connection: &PgConnection) -> Vec<Vec<JsTile>> {
     use schema::game_tiles::dsl::*;

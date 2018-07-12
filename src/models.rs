@@ -27,6 +27,7 @@ pub struct Game {
   pub id: i32,
   pub current_player_id: Option<i32>,
   pub current_state: Option<String>,
+  pub current_tile_id: Option<i32>,
 }
 
 #[derive(Queryable)]

@@ -38,7 +38,7 @@ import TileHelper from '../tile_helper.js'
 import _ from 'lodash'
 
 export default {
-  props: ['tile', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'hoverInfo'],
+  props: ['tile', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'row', 'column', 'currentTile', 'hoverInfo', 'state'],
   methods: {
     anySurround() {
       return this.getTile(this.row - 1, this.column).playerId ||
@@ -63,6 +63,8 @@ export default {
       this.hover = false;
     },
     mouseOver(side) {
+      if (this.state !== 'place') return;
+
       const sideType = TileHelper.sideType(this.tile, side);
 
       this.hoverTile(this.tile, this.row, this.column, side, sideType);
@@ -108,11 +110,13 @@ export default {
       const klasses = ["tile"];
       const matches = this.currentTile && this.currentTile.playerId && TileHelper.matchesSurrounding(this.currentTile, this.getTile, this.row, this.column);
       const surround = this.anySurround();
+      const showHover = this.hover && this.state === 'action';
 
-      if (matches && surround && this.hover) {
+
+      if (matches && surround && showHover) {
         klasses.push("playable-hover");
 
-      } else if (surround && this.hover) {
+      } else if (surround && showHover) {
         klasses.push("hover");
 
       } else if (this.anySurround()) {

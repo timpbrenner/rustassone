@@ -108,7 +108,8 @@ fn play(data: (actix_web::Path<GamePath>, Json<TilePlay>)) -> impl Responder {
     let (path, play) = data;
     println!("PLAY TILE: {}, {}", path.game_id, play.tile_id.unwrap());
 
-    play_tile(path.game_id, play.into_inner())
+    play_tile(path.game_id, play.into_inner());
+    get_game(path.game_id)
 }
 
 // API CALL: Play a Meeple

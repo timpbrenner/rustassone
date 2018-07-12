@@ -34,6 +34,7 @@ table! {
         id -> Int4,
         current_player_id -> Nullable<Int4>,
         current_state -> Nullable<Text>,
+        current_tile_id -> Nullable<Int4>,
     }
 }
 

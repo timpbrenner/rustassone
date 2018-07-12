@@ -3,6 +3,7 @@
     <tile
       v-for="(tile, index) in row"
       v-bind:tile="tile"
+      v-bind:state="state"
       v-bind:hover-info="hoverInfo"
       v-bind:current-tile="currentTile"
       v-bind:get-tile="getTile"
@@ -21,7 +22,7 @@
 import Tile from './Tile.vue'
 
 export default {
-  props: ['row', 'rowIndex', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'currentTile', 'hoverInfo'],
+  props: ['row', 'rowIndex', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'currentTile', 'hoverInfo', 'state'],
   components: { Tile },
 }
 </script>

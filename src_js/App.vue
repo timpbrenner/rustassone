@@ -35,6 +35,7 @@
     <div class='game' v-if="grid">
       <tile-row
         v-for="(row, index) in grid"
+        v-bind:state="state"
         v-bind:hover-info="hoverInfo"
         v-bind:row="row"
         v-bind:row-index="index"
@@ -94,9 +95,9 @@ export default {
       this.playerId = data.id;
     },
     updateGrid(data) {
-      console.log('----------');
+      console.log('---------------');
       console.log(data);
-      console.log('----------');
+      console.log('---------------');
 
       this.players = data.players;
       this.grid = data.grid;
@@ -147,11 +148,9 @@ export default {
           row_offset: rowOffset,
           column_offset: columnOffset,
         }),
-        success: function(d) { console.log('played'); },
+        success: this.updateGrid,
         error: function(d) { console.log('Error playing tile'); }
       });
-
-      this.placeTile(row, column);
     },
     playMeeple(tileId, side) {
       $.ajax({
@@ -180,55 +179,6 @@ export default {
         cityHovers: {},
       };
     },
-    placeTile(row, column) {
-      let rowOffset = 0;
-      let columnOffset = 0;
-      const newGrid = _.cloneDeep(this.grid);
-      const rowLength = newGrid.length;
-      const columnLength = newGrid[0].length;
-      newGrid[row][column] = Object.assign(this.grid[row][column], this.currentTile);
-
-      if (row === 0) {
-        // add row in the beginning
-        const newRow = [];
-        rowOffset = this.grid[0][0].rowOffset - 1;
-        columnOffset = this.grid[0][0].columnOffset;
-        for (i = 0; i < columnLength; i++) {
-          newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
-        }
-        newGrid.unshift(newRow);
-      } else if (row === this.grid.length - 1) {
-        // add row at end
-        const newRow = [];
-        rowOffset = this.grid[rowLength - 1][0].rowOffset + 1;
-        columnOffset = this.grid[0][0].columnOffset;
-        for (i = 0; i < columnLength; i++) {
-          newRow.push({ rowOffset: rowOffset, columnOffset: columnOffset + i });
-        }
-
-        newGrid.push(newRow);
-      }
-
-      if (column === 0) {
-        // add column at beginning of each row
-        rowOffset = this.grid[0][0].rowOffset;
-        columnOffset = this.grid[0][0].columnOffset - 1;
-        newGrid.forEach(function(row, i) {
-          row.unshift({ columnOffset: columnOffset, rowOffset: rowOffset + i});
-        })
-      } else if (column === columnLength - 1) {
-        // add column at end of each row
-        rowOffset = this.grid[0][0].rowOffset;
-        columnOffset = this.grid[0][columnLength - 1].columnOffset + 1;
-        newGrid.forEach(function(row, i) {
-          row.push({ columnOffset: columnOffset, rowOffset: rowOffset + i});
-        })
-      }
-
-      this.currentTile = {};
-      this.state = 'draw';
-      this.grid = newGrid;
-    }
   }
 }
 </script>
