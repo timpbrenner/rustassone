@@ -11,13 +11,14 @@
 import TileHelper from '../tile_helper.js'
 
 export default {
-  props: ['currentTile', 'rotateTile'],
+  props: ['currentTile', 'rotateTile', 'currentRotation'],
   methods: {
     rotate() {
       this.rotateTile();
     },
     innerComponentClasses(side) {
-      const sideName = ['top', 'right', 'bottom', 'left'][side];
+      const rotatedSide = (side + this.currentRotation) % 4;
+      const sideName = ['top', 'right', 'bottom', 'left'][rotatedSide];
       const sideType = TileHelper.sideType(this.currentTile, side);
 
       if (sideType === 2) {

@@ -6,6 +6,7 @@
       v-bind:state="state"
       v-bind:hover-info="hoverInfo"
       v-bind:current-tile="currentTile"
+      v-bind:current-rotation="currentRotation"
       v-bind:get-tile="getTile"
       v-bind:play-tile="playTile"
       v-bind:play-meeple="playMeeple"
@@ -22,7 +23,7 @@
 import Tile from './Tile.vue'
 
 export default {
-  props: ['row', 'rowIndex', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'currentTile', 'hoverInfo', 'state'],
+  props: ['row', 'rowIndex', 'playTile', 'playMeeple', 'getTile', 'hoverTile', 'clearHoverTile', 'currentTile', 'hoverInfo', 'state', 'currentRotation'],
   components: { Tile },
 }
 </script>

@@ -23,16 +23,18 @@ const TileHelper = {
     return ["farm", "city", "road"][TileHelper.sideType(tile, side)];
   },
 
-  matchesSurrounding(tile, getTile, row, column) {
-    const above = getTile(row - 1, column);
-    const right = getTile(row, column + 1);
-    const below = getTile(row + 1, column);
-    const left = getTile(row, column - 1);
+  matchesSurrounding(tile, rotation, getTile, row, column) {
+    const surroundingTiles = [
+      getTile(row - 1, column),
+      getTile(row, column + 1),
+      getTile(row + 1, column),
+      getTile(row, column - 1),
+    ];
 
-    return (!above.playerId || TileHelper.sideType(tile, 0) === TileHelper.sideType(above, 2)) &&
-     (!right.playerId || TileHelper.sideType(tile, 1) === TileHelper.sideType(right, 3)) &&
-     (!below.playerId || TileHelper.sideType(tile, 2) === TileHelper.sideType(below, 0)) &&
-     (!left.playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(left, 1));
+    return (!surroundingTiles[rotation].playerId || TileHelper.sideType(tile, 0) === TileHelper.sideType(surroundingTiles[rotation], (2 + rotation) % 4)) &&
+     (!surroundingTiles[(1 + rotation) % 4].playerId || TileHelper.sideType(tile, 1) === TileHelper.sideType(surroundingTiles[(1 + rotation) % 4], (3 + rotation) % 4)) &&
+     (!surroundingTiles[(2 + rotation) % 4].playerId || TileHelper.sideType(tile, 2) === TileHelper.sideType(surroundingTiles[(2 + rotation) % 4], (0 + rotation) % 4)) &&
+     (!surroundingTiles[(3 + rotation) % 4].playerId || TileHelper.sideType(tile, 3) === TileHelper.sideType(surroundingTiles[(3 + rotation) % 4], (1 + rotation) % 4));
   },
 
   getHoverInfo(grid, row, column, side, playerId, sideType, hoverData = { ends: false, players: [], roadHovers: {}, cityHovers: {} }) {

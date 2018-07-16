@@ -21,8 +21,14 @@
         DRAW
       </button>
     </div>
+    <div v-else-if="state === 'place'">
+      <button class="draw-button" @click="pass" >
+        PASS
+      </button>
+    </div>
     <div v-else-if="state === 'action'">
       <current-tile
+        v-bind:current-rotation="currentRotation"
         v-bind:current-tile="currentTile"
         v-bind:rotate-tile="rotateTile">
       </current-tile>
@@ -39,6 +45,7 @@
         v-bind:hover-info="hoverInfo"
         v-bind:row="row"
         v-bind:row-index="index"
+        v-bind:current-rotation="currentRotation"
         v-bind:current-tile="currentTile"
         v-bind:get-tile="getTile"
         v-bind:play-tile="playTile"
@@ -65,6 +72,7 @@ export default {
   data() {
     return  {
       state: 'draw',
+      currentRotation: 0,
       currentTile: null,
       playerId: null,
       grid: null,
@@ -103,6 +111,7 @@ export default {
       this.grid = data.grid;
       this.state = data.currentState;
       this.currentTurn = data.currentPlayerId;
+      this.currentTile = data.currentTile;
     },
     start() {
       $.ajax({
@@ -116,6 +125,13 @@ export default {
         url: 'http://localhost:8088/game/' + this.gameId + '/tiles',
         success: this.drawTile,
         error: function(e) { console.log('Draw Fail'); },
+      });
+    },
+    pass() {
+      $.ajax({
+        url: 'http://localhost:8088/game/' + this.gameId + '/pass',
+        success: this.updateGrid,
+        error: function(e) { console.log('Pass Fail'); },
       });
     },
     drawTile(tile) {
@@ -132,10 +148,7 @@ export default {
       return tile;
     },
     rotateTile() {
-      this.currentTile = Object.assign({}, this.currentTile, {
-        cities: _.flatMap(this.currentTile.cities, function(side) { return (side + 1) % 4; }),
-        roads: _.flatMap(this.currentTile.roads, function(side) { return (side + 1) % 4; }),
-      })
+      this.currentRotation = (this.currentRotation + 1) % 4;
     },
     playTile(row, column, rowOffset, columnOffset) {
       $.ajax({
@@ -145,6 +158,7 @@ export default {
         data: JSON.stringify({
           tile_id: this.currentTile.id,
           player_id: this.playerId,
+          rotation: this.currentRotation,
           row_offset: rowOffset,
           column_offset: columnOffset,
         }),

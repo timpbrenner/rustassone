@@ -53,6 +53,7 @@ pub struct GameTile {
   pub player_id: Option<i32>,
   pub row_offset: i32,
   pub column_offset: i32,
+  pub rotation: Option<i32>,
 }
 
 #[derive(Queryable)]

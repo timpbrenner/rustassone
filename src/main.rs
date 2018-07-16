@@ -88,6 +88,15 @@ fn update(path: actix_web::Path<GamePath>) -> impl Responder {
     start_game(path.game_id)
 }
 
+// COULD COMBINE THESE
+fn pass(path: actix_web::Path<GamePath>) -> impl Responder {
+    println!("UPDATE GAME: {}", path.game_id);
+
+    let connection = establish_connection();
+    update_game_state(path.game_id, "draw".to_owned(), None, &connection);
+    get_game(path.game_id)
+}
+
 // API CALL: Player joining the game
 fn create_player(data: (actix_web::Path<GamePath>, Json<Info>)) -> impl Responder {
     let (path, info) = data;
@@ -132,6 +141,7 @@ fn main() {
                 .resource("/game", |r| r.method(Method::GET).f(create))
                 .resource("/game/{game_id}", |r| r.method(Method::GET).f(show))
                 .resource("/game/{game_id}/start", |r| r.method(Method::GET).with(update))
+                .resource("/game/{game_id}/pass", |r| r.method(Method::GET).with(pass))
                 .resource("/game/{game_id}/tiles", |r| r.method(Method::GET).with(draw))
                 .resource("/game/{game_id}/play", |r| r.method(Method::POST).with(play))
                 .resource("/game/{game_id}/players", |r| r.method(Method::POST).with(create_player))

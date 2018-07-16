@@ -11,6 +11,7 @@ use std;
 #[derive(Deserialize)]
 pub struct TilePlay {
     pub tile_id: Option<i32>,
+    pub rotation: Option<i32>,
     pub player_id: Option<i32>,
     pub row_offset: Option<i32>,
     pub column_offset: Option<i32>
@@ -32,7 +33,7 @@ pub fn create_game() -> JsGame {
                 .get_result::<Game>(&conn);
 
     let game = game_result.ok().unwrap();
-    play_tile(game.id, TilePlay { tile_id: Some(4), player_id: None, row_offset: Some(0), column_offset: Some(0) });
+    play_tile(game.id, TilePlay { tile_id: Some(4), player_id: None, row_offset: Some(0), column_offset: Some(0), rotation: None });
 
     get_game(game.id)
 }
@@ -46,16 +47,23 @@ pub fn start_game(game_id: i32) -> JsGame {
 
 pub fn get_game(game_id: i32) -> JsGame {
     use schema::games::dsl::*;
+    use schema::tiles::dsl::*;
 
     let connection = establish_connection();
     let game = games.filter(::schema::games::dsl::id.eq(game_id)).get_result::<Game>(&connection).expect("Error loading games");
+
+    let tile = tiles.filter(::schema::tiles::dsl::id.eq(game.current_tile_id.unwrap_or(-1)))
+        .get_result::<Tile>(&connection)
+        .optional()
+        .expect("Error loading games");
 
     JsGame {
         id: game.id,
         grid: build_game_grid(game.id, &connection),
         players: get_game_players(game.id, &connection),
         currentPlayerId: game.current_player_id.unwrap_or(-1),
-        currentState: game.current_state.unwrap_or("draw".to_owned())
+        currentState: game.current_state.unwrap_or("draw".to_owned()),
+        currentTile: if tile.is_some() { Some(get_tile(tile.unwrap(), 0, &connection)) } else { None }
     }
 }
 
@@ -70,7 +78,7 @@ pub fn draw_tile(current_game_id: i32) -> JsTile {
 
     update_game_state(current_game_id, "action".to_owned(), Some(tile.id), &connection);
 
-    get_tile(tile, &connection)
+    get_tile(tile, 0, &connection)
 }
 
 pub fn play_tile(current_game_id: i32, play: TilePlay) -> JsTile {
@@ -83,11 +91,14 @@ pub fn play_tile(current_game_id: i32, play: TilePlay) -> JsTile {
                 game_id.eq(current_game_id),
                 tile_id.eq(play.tile_id.unwrap()),
                 player_id.eq(play.player_id),
+                rotation.eq(play.rotation.unwrap()),
                 row_offset.eq(play.row_offset.unwrap()),
                 column_offset.eq(play.column_offset.unwrap()),
             )
         ).execute(&conn);
-    update_game_state(current_game_id, "place".to_owned(), None, &conn);
+
+    let game = get_game(current_game_id);
+    update_game_state(current_game_id, "place".to_owned(), Some(game.currentTile.unwrap().id), &conn);
 
     JsTile { id: 1, playerId: 0, cities: Vec::new(), roads: Vec::new(), columnOffset: 0, rowOffset: 0, meeple: None }
 }
@@ -106,12 +117,12 @@ pub fn play_meeple(play_game_id: i32, play: MeeplePlay) -> String  {
             )
         ).execute(&connection);
 
+
+    update_game_state(play_game_id, "draw".to_owned(), None, &connection);
     String::from("Return Something")
 }
 
-// Private
-
-fn update_game_state(current_game_id: i32, state: String, tile_id: Option<i32>, connection: &PgConnection) -> String {
+pub fn update_game_state(current_game_id: i32, state: String, tile_id: Option<i32>, connection: &PgConnection) -> String {
     use schema::games::dsl::*;
 
     let target = games.filter(::schema::games::dsl::id.eq(current_game_id));
@@ -123,6 +134,8 @@ fn update_game_state(current_game_id: i32, state: String, tile_id: Option<i32>, 
 
     "Somethig".to_owned()
 }
+
+// Private
 
 fn build_game_grid(current_game_id: i32, connection: &PgConnection) -> Vec<Vec<JsTile>> {
     use schema::game_tiles::dsl::*;
@@ -142,11 +155,12 @@ fn build_game_grid(current_game_id: i32, connection: &PgConnection) -> Vec<Vec<J
         for column_offset_i in min_column_offset..(max_column_offset + 1) {
             let played = played_tiles.iter().find(|t| t.row_offset == row_offset_i && t.column_offset == column_offset_i);
             if played.is_some() {
+                let played_rotation = played.unwrap().rotation.unwrap_or(0);
                 let tile = tiles.filter(::schema::tiles::dsl::id.eq(played.unwrap().tile_id))
                                 .get_result::<Tile>(connection).expect("Error loading tiles");
 
-                let mut blah_tile = get_tile(tile, connection);
-                blah_tile.playerId = 1;//played.unwrap().player_id.unwrap();
+                let mut blah_tile = get_tile(tile, played_rotation, connection);
+                blah_tile.playerId = played.unwrap().player_id.unwrap_or(-1);
                 blah_tile.rowOffset = played.unwrap().row_offset;
                 blah_tile.columnOffset = played.unwrap().column_offset;
                 row.push(blah_tile);
@@ -161,7 +175,7 @@ fn build_game_grid(current_game_id: i32, connection: &PgConnection) -> Vec<Vec<J
     grid
 }
 
-fn get_tile(tile: Tile, connection: &PgConnection) -> JsTile {
+fn get_tile(tile: Tile, rotation: i32, connection: &PgConnection) -> JsTile {
     use schema::tile_roads::dsl::*;
     use schema::tile_cities::dsl::*;
     use schema::game_pieces::dsl::*;
@@ -183,16 +197,16 @@ fn get_tile(tile: Tile, connection: &PgConnection) -> JsTile {
 
         js_meeple.playerId = unwrapped_meeple.player_id;
         js_meeple.tileId = unwrapped_meeple.tile_id;
-        js_meeple.side = unwrapped_meeple.side;
+        js_meeple.side = (unwrapped_meeple.side + rotation) % 4;
     }
 
     let mut output = JsTile { id: tile.id, playerId: 0, cities: Vec::new(), roads: Vec::new(), columnOffset: 0, rowOffset: 0, meeple: Some(js_meeple) };
     for city in cities {
-        output.cities.push(city.city_side);
+        output.cities.push((city.city_side + rotation) % 4);
     }
 
     for road in roads {
-        output.roads.push(road.road_side);
+        output.roads.push((road.road_side + rotation) % 4);
     }
 
     output

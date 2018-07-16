@@ -26,6 +26,7 @@ table! {
         player_id -> Nullable<Int4>,
         row_offset -> Int4,
         column_offset -> Int4,
+        rotation -> Nullable<Int4>,
     }
 }
 

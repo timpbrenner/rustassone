@@ -1,0 +1,2 @@
+ALTER TABLE game_tiles
+ADD COLUMN rotation INTEGER DEFAULT 0;

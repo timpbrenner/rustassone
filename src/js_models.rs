@@ -46,6 +46,7 @@ pub struct JsGame {
     pub players: Vec<JsPlayer>,
     pub currentPlayerId: i32,
     pub currentState: String,
+    pub currentTile: Option<JsTile>,
 }
 
 impl Responder for JsGame {
